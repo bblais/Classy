@@ -9,7 +9,8 @@ import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.linalg import norm
 from itertools import cycle, izip
-from sklearn.utils import atleast2d_or_csr, check_random_state
+from sklearn.utils import check_random_state
+from sklearn.utils import check_X_y
 from sklearn.utils import gen_even_slices
 from sklearn.utils import shuffle
 from sklearn.utils.extmath import safe_sparse_dot
@@ -269,11 +270,12 @@ class Autoencoder(BaseEstimator, TransformerMixin):
         -------
         self
         """
-        X = atleast2d_or_csr(X, dtype=np.float64, order="C")
+        #X = atleast2d_or_csr(X, dtype=np.float64, order="C")
         n_samples, n_features = X.shape
         self._init_fit(n_features)
         self._init_param()
         self._init_t_eta_()
+        X,y=check_X_y(X,y, dtype=np.float64, order="C")
         
         if self.shuffle_data:
             X, y = shuffle(X, y, random_state=self.random_state)

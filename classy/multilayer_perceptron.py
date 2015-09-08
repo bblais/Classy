@@ -15,7 +15,8 @@ from sklearn.externals import six
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.utils import gen_even_slices
 from sklearn.utils import shuffle
-from sklearn.utils import atleast2d_or_csr, check_random_state, column_or_1d
+#from sklearn.utils import atleast2d_or_csr, check_random_state, column_or_1d
+from sklearn.utils import check_X_y,check_random_state
 from sklearn.utils.extmath import safe_sparse_dot
 from scipy.special import expit as logistic_sigmoid
 
@@ -244,7 +245,7 @@ class BaseMultilayerPerceptron(six.with_metaclass(ABCMeta, BaseEstimator)):
         -------
         self
         """
-        X = atleast2d_or_csr(X)
+        X,y=check_X_y(X,y)
 
         self._validate_params()
 
@@ -492,7 +493,7 @@ class BaseMultilayerPerceptron(six.with_metaclass(ABCMeta, BaseEstimator)):
         -------
         self : returns an instance of self.
         """
-        X = atleast2d_or_csr(X)
+        X,y=check_X_y(X,y)
 
         self.n_outputs = y.shape[1]
 
@@ -527,7 +528,9 @@ class BaseMultilayerPerceptron(six.with_metaclass(ABCMeta, BaseEstimator)):
         array, shape (n_samples)
         Predicted target values per element in X.
         """
-        X = atleast2d_or_csr(X)
+
+        X,y=check_X_y(X,None)
+
 
         a_hidden = self.activation_func(safe_sparse_dot(X, self.coef_hidden_) +
                                         self.intercept_hidden_)
@@ -664,7 +667,8 @@ class MultilayerPerceptronClassifier(BaseMultilayerPerceptron,
         -------
         self
         """
-        y = column_or_1d(y, warn=True)
+
+    
 
         # needs a better way to check multi-label instances
         if isinstance(np.reshape(y, (-1, 1))[0][0], list):
@@ -675,6 +679,8 @@ class MultilayerPerceptronClassifier(BaseMultilayerPerceptron,
         self.classes_ = np.unique(y)
         self._lbin = LabelBinarizer()
         y = self._lbin.fit_transform(y)
+
+        #X,y=check_X_y(X,y)
 
         super(MultilayerPerceptronClassifier, self).fit(X, y)
 
@@ -722,7 +728,7 @@ class MultilayerPerceptronClassifier(BaseMultilayerPerceptron,
             self._lbin = LabelBinarizer()
             self._lbin._classes = classes
 
-        y = column_or_1d(y, warn=True)
+        X,y=check_X_y(X,y)
 
         # needs a better way to check multi-label instances
         if isinstance(np.reshape(y, (-1, 1))[0][0], list):
@@ -747,7 +753,7 @@ class MultilayerPerceptronClassifier(BaseMultilayerPerceptron,
         array, shape (n_samples)
             Predicted target values per element in X.
         """
-        X = atleast2d_or_csr(X)
+        X,y=check_X_y(X,None)
         scores = self.decision_function(X)
 
         if len(scores.shape) == 1 or self.multi_label is True:
@@ -925,7 +931,7 @@ class MultilayerPerceptronRegressor(BaseMultilayerPerceptron, RegressorMixin):
         -------
         self
         """
-        y = np.atleast_1d(y)
+        X,y=check_X_y(X,y)
 
         if y.ndim == 1:
             y = np.reshape(y, (-1, 1))
@@ -949,7 +955,7 @@ class MultilayerPerceptronRegressor(BaseMultilayerPerceptron, RegressorMixin):
         -------
         self
         """
-        y = np.atleast_1d(y)
+        X,y=check_X_y(X,y)
 
         if y.ndim == 1:
             y = np.reshape(y, (-1, 1))
@@ -969,6 +975,6 @@ class MultilayerPerceptronRegressor(BaseMultilayerPerceptron, RegressorMixin):
         array, shape (n_samples)
             Predicted target values per element in X.
         """
-        X = atleast2d_or_csr(X)
+        X,y=check_X_y(X,None)
 
         return self.decision_function(X)

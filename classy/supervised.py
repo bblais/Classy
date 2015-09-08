@@ -1,8 +1,9 @@
 import numpy as np
 import pylab as pl
 import utils
-from sklearn.utils.validation import check_arrays, atleast2d_or_csr, column_or_1d
+from sklearn.utils import check_X_y,check_array
 from multilayer_perceptron  import MultilayerPerceptronClassifier
+from mlp import MLPClassifier
 from sklearn.utils.extmath import safe_sparse_dot
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression as LogReg
@@ -21,6 +22,41 @@ class SVM(SVC,GenericClassifier):
 
 class LogisticRegression(LogReg,GenericClassifier):
     pass
+
+class BackProp2(MLPClassifier,GenericClassifier):
+    def __init__(self,**kwargs):
+        if 'n_hidden' not in kwargs:
+            raise ValueError,"Must specify n_hidden"
+    
+        MLPClassifier.__init__(self,**kwargs)
+        self.equivalent={'weights_xh':'weights1_',
+                        'weights_hy':'weights2_',
+                        'bias_h':'bias1_',
+                        'bias_y':'bias2_',
+                        }
+        self.shuffle_data=True
+        self.max_epochs=50
+
+    def fit(self,*args,**kwargs):
+        if 'max_epochs' not in kwargs:
+            max_epochs=self.max_epochs
+
+        self.max_epochs=max_epochs
+            
+        MLPClassifier.fit(self,*args,
+            max_epochs=self.max_epochs,
+            shuffle_data=self.shuffle_data,
+            **kwargs)
+        for name in self.equivalent:
+            super(MLPClassifier,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+    
+
+    def output(self, X):
+        n_samples = X.shape[0]
+        x_hidden = np.empty((n_samples, self.n_hidden))
+        x_output = np.empty((n_samples, self.n_outs))
+        self._forward(None, X, slice(0, n_samples), x_hidden, x_output)
+        return x_hidden,x_output
 
     
 class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
@@ -56,7 +92,7 @@ class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
         array, shape (n_samples)
         Predicted target values per element in X.
         """
-        X = atleast2d_or_csr(X)
+        X = check_array(X)
 
         a_hidden = self.activation_func(safe_sparse_dot(X, self.coef_hidden_) +
                                         self.intercept_hidden_)
@@ -93,13 +129,8 @@ class NaiveBayes(GaussianNB,GenericClassifier):
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
     
     def anotherfit(self, X, y):
-        X, y = check_arrays(X, y, sparse_format="csr")
-        
-        try:
-            y = column_or_1d(y, warn=True)
-        except ValueError:
-            raise ValueError,"Targets not specified correctly.  Check the data."
-        
+        X,y=check_X_y(X,y)
+            
         GaussianNB.fit(self,X,y)
     
         for name in self.equivalent:
@@ -169,7 +200,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         except AttributeError:
             pass
         
-        center=np.atleast_2d(np.array(center,dtype=np.float))
+        center=check_array(center,dtype=np.float)
         radius=np.array([radius],dtype=np.float)
         target=np.array([target],dtype=np.int)
         if len(self.centers_)==0:
@@ -183,8 +214,9 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         
         
     def fit(self, X, y):
-        X, y = check_arrays(X, y, sparse_format="csr")
-        y = column_or_1d(y, warn=True)
+        X,y=check_X_y(X,y)
+        # X, y = check_arrays(X, y, sparse_format="csr")
+        # y = column_or_1d(y, warn=True)
         n_samples, n_features = X.shape
         classes = np.unique(y)
         self.classes_ = classes
@@ -245,7 +277,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
                 
                 
     def predict(self,X):
-        X = atleast2d_or_csr(X)        
+        X = check_array(X)        
         if len(self.centers_)==0:
             raise AttributeError("Model has not been trained yet.")
         
@@ -303,7 +335,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         except AttributeError:
             pass
 
-        center=np.atleast_2d(np.array(center,dtype=np.float))
+        center=check_array(center,dtype=np.float)
         radius=np.array([radius],dtype=np.float)
         target=np.array([target],dtype=np.int)
         if len(self.centers_)==0:
@@ -317,8 +349,9 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         
         
     def fit(self, X, y):
-        X, y = check_arrays(X, y, sparse_format="csr")
-        y = column_or_1d(y, warn=True)
+        X,y=check_X_y(X,y)
+        # X, y = check_arrays(X, y, sparse_format="csr")
+        # y = column_or_1d(y, warn=True)
         n_samples, n_features = X.shape
         classes = np.unique(y)
         self.classes_ = classes
@@ -366,7 +399,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
             pass_number+=1
                 
     def predict(self,X):
-        X = atleast2d_or_csr(X)        
+        X = check_array(X)        
         if len(self.centers_)==0:
             raise AttributeError("Model has not been trained yet.")
         

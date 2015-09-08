@@ -1,6 +1,7 @@
-from sklearn.utils.validation import check_arrays, atleast2d_or_csr, column_or_1d
+#from sklearn.utils.validation import check_arrays, atleast2d_or_csr, column_or_1d
 from sklearn.utils.extmath import safe_sparse_dot
 import autoencoder
+from sklearn.utils import check_X_y
 from autoencoder import Autoencoder as AutoEncoder
 from sklearn.decomposition import RandomizedPCA
 from numpy import array
