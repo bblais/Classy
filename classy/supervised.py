@@ -3,7 +3,6 @@ import pylab as pl
 import utils
 from sklearn.utils import check_X_y,check_array
 from multilayer_perceptron  import MultilayerPerceptronClassifier
-from mlp import MLPClassifier
 from sklearn.utils.extmath import safe_sparse_dot
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression as LogReg
@@ -23,54 +22,14 @@ class SVM(SVC,GenericClassifier):
 class LogisticRegression(LogReg,GenericClassifier):
     pass
 
-class BackProp2(MLPClassifier,GenericClassifier):
-    def __init__(self,**kwargs):
-        if 'n_hidden' not in kwargs:
-            raise ValueError,"Must specify n_hidden"
-    
-        MLPClassifier.__init__(self,**kwargs)
-        self.equivalent={'weights_xh':'weights1_',
-                        'weights_hy':'weights2_',
-                        'bias_h':'bias1_',
-                        'bias_y':'bias2_',
-                        }
-        self.shuffle_data=True
-        self.max_epochs=50
-
-    def fit(self,*args,**kwargs):
-        if 'max_epochs' not in kwargs:
-            max_epochs=self.max_epochs
-
-        self.max_epochs=max_epochs
-            
-        MLPClassifier.fit(self,*args,
-            max_epochs=self.max_epochs,
-            shuffle_data=self.shuffle_data,
-            **kwargs)
-        for name in self.equivalent:
-            super(MLPClassifier,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
-    
-
-    def output(self, X):
-        n_samples = X.shape[0]
-        x_hidden = np.empty((n_samples, self.n_hidden))
-        x_output = np.empty((n_samples, self.n_outs))
-        self._forward(None, X, slice(0, n_samples), x_hidden, x_output)
-        return x_hidden,x_output
-
-    
+   
 class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
     def __init__(self,**kwargs):
-        if 'n_hidden' not in kwargs:
-            raise ValueError,"Must specify n_hidden"
         if 'tol' not in kwargs:
             kwargs['tol']=1e-7
     
         MultilayerPerceptronClassifier.__init__(self,**kwargs)
-        self.equivalent={'weights_xh':'coef_hidden_',
-                        'weights_hy':'coef_output_',
-                        'bias_h':'intercept_hidden_',
-                        'bias_y':'intercept_output_',
+        self.equivalent={
                         }
         
     def fit(self,*args,**kwargs):
@@ -92,16 +51,30 @@ class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
         array, shape (n_samples)
         Predicted target values per element in X.
         """
-        X = check_array(X)
 
-        a_hidden = self.activation_func(safe_sparse_dot(X, self.coef_hidden_) +
-                                        self.intercept_hidden_)
-        output = safe_sparse_dot(a_hidden, self.coef_output_) +\
-            self.intercept_output_
-        if output.shape[1] == 1:
-            output = output.ravel()
+        X = check_array(X, accept_sparse=['csr', 'csc', 'coo'])
 
-        return a_hidden,output
+        # Make sure self.hidden_layer_sizes is a list
+        hidden_layer_sizes = self.hidden_layer_sizes
+        if not hasattr(hidden_layer_sizes, "__iter__"):
+            hidden_layer_sizes = [hidden_layer_sizes]
+        hidden_layer_sizes = list(hidden_layer_sizes)
+
+        layer_units = [X.shape[1]] + hidden_layer_sizes + \
+            [self.n_outputs_]
+
+        # Initialize layers
+        activations = []
+        activations.append(X)
+
+        for i in range(self.n_layers_ - 1):
+            activations.append(np.empty((X.shape[0],
+                                         layer_units[i + 1])))
+        # forward propagate
+        self._forward_pass(activations, with_output_activation=False)
+        y_pred = activations[-1]
+
+        return activations[1:]
 
 
 from sklearn.neighbors import KNeighborsClassifier

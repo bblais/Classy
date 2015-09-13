@@ -1,9 +1,9 @@
-#from sklearn.utils.validation import check_arrays, atleast2d_or_csr, column_or_1d
 from sklearn.utils.extmath import safe_sparse_dot
 import autoencoder
-from sklearn.utils import check_X_y
+from sklearn.utils import check_X_y,check_array
 from autoencoder import Autoencoder as AutoEncoder
 from sklearn.decomposition import RandomizedPCA
+from multilayer_perceptron  import MultilayerPerceptronAutoencoder
 from numpy import array
 from datasets import Struct
 from copy import deepcopy
@@ -41,22 +41,20 @@ class GenericFilter(object):
         return new_data
 
 
-class AutoEncoder(autoencoder.Autoencoder,GenericFilter):
+class AutoEncoder(MultilayerPerceptronAutoencoder,GenericFilter):
 
     def __init__(self,*args,**kwargs):    
-        autoencoder.Autoencoder.__init__(self,*args,**kwargs)
-        self.equivalent={'weights_xh':'coef_hidden_',
-                        'weights_hy':'coef_output_',
-                    }
+        MultilayerPerceptronAutoencoder.__init__(self,*args,**kwargs)
+        self.equivalent={}
     def fit(self,*args,**kwargs):
-        autoencoder.Autoencoder.fit(self,*args,**kwargs)
+        MultilayerPerceptronAutoencoder.fit(self,*args,**kwargs)
         for name in self.equivalent:
-            super(autoencoder.Autoencoder,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+            super(MultilayerPerceptronAutoencoder,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
                         
     def fit_transform(self,*args,**kwargs):
-        result=autoencoder.Autoencoder.fit_transform(self,*args,**kwargs)
+        result=MultilayerPerceptronAutoencoder.fit_transform(self,*args,**kwargs)
         for name in self.equivalent:
-            super(autoencoder.Autoencoder,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+            super(MultilayerPerceptronAutoencoder,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
 
         return result
 
@@ -72,16 +70,30 @@ class AutoEncoder(autoencoder.Autoencoder,GenericFilter):
         array, shape (n_samples)
         Predicted target values per element in X.
         """
-        X = atleast2d_or_csr(X)
+        X = check_array(X, accept_sparse=['csr', 'csc', 'coo'])
 
-        a_hidden = self.activation_func(safe_sparse_dot(X, self.coef_hidden_) +
-                                        self.intercept_hidden_)
-        output = safe_sparse_dot(a_hidden, self.coef_output_) +\
-            self.intercept_output_
-        if output.shape[1] == 1:
-            output = output.ravel()
+        # Make sure self.hidden_layer_sizes is a list
+        hidden_layer_sizes = self.hidden_layer_sizes
+        if not hasattr(hidden_layer_sizes, "__iter__"):
+            hidden_layer_sizes = [hidden_layer_sizes]
+        hidden_layer_sizes = list(hidden_layer_sizes)
 
-        return a_hidden,output
+        layer_units = [X.shape[1]] + hidden_layer_sizes + \
+            [self.n_outputs_]
+
+        # Initialize layers
+        activations = []
+        activations.append(X)
+
+        for i in range(self.n_layers_ - 1):
+            activations.append(np.empty((X.shape[0],
+                                         layer_units[i + 1])))
+        # forward propagate
+        self._forward_pass(activations, with_output_activation=False)
+        y_pred = activations[-1]
+
+        return activations[1:]
+
 
     def plot(self,only=None):
         from pylab import plot,subplot,sqrt,ceil,title

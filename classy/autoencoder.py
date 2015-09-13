@@ -9,14 +9,14 @@ import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.linalg import norm
 from itertools import cycle, izip
+from sklearn.utils import check_X_y,check_array
 from sklearn.utils import check_random_state
-from sklearn.utils import check_X_y
 from sklearn.utils import gen_even_slices
 from sklearn.utils import shuffle
 from sklearn.utils.extmath import safe_sparse_dot
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.extmath import logistic_sigmoid, safe_sparse_dot
-
+from sklearn.utils.extmath import safe_sparse_dot
+from base import logistic, softmax, binary_KL_divergence
 
 def _identity(X):
     """returns the same input array."""
@@ -147,7 +147,7 @@ class Autoencoder(BaseEstimator, TransformerMixin):
     """
     def __init__(
         self, n_hidden=25, algorithm='l-bfgs',
-        decoder = 'non_linear', alpha=3e-3, beta=3, sparsity_param=0.1,
+        decoder = 'linear', alpha=3e-3, beta=3, sparsity_param=0.1,
         batch_size=500, shuffle_data=False, max_iter=200, tol=1e-5, learning_rate="constant", eta0=0.5, 
         power_t = 0.25, verbose=False, random_state=None):
             
@@ -167,23 +167,34 @@ class Autoencoder(BaseEstimator, TransformerMixin):
         self.verbose = verbose
         self.random_state = random_state
         
-        self.activation_func = logistic_sigmoid
+        self.activation_func = logistic
         self.derivative_func = _d_logistic
         
     def _init_fit(self, n_features):
         """Initialize weight and bias parameters."""
+
         rng = check_random_state(self.random_state)
+        weight_init_bound1 = np.sqrt(6. / (n_features + self.n_hidden))
+        weight_init_bound2 = np.sqrt(6. / (n_features + self.n_hidden))      
+        rng = check_random_state(self.random_state)
+        self.coef_hidden_ = rng.uniform(-weight_init_bound1, weight_init_bound1, (n_features, self.n_hidden))
+        rng = check_random_state(self.random_state)
+        self.intercept_hidden_ = rng.uniform(-weight_init_bound1, weight_init_bound1, self.n_hidden)
+        rng = check_random_state(self.random_state)
+        self.coef_output_ = rng.uniform(-weight_init_bound2, weight_init_bound2, (self.n_hidden, n_features))
+        rng = check_random_state(self.random_state)
+        self.intercept_output_ = rng.uniform(-weight_init_bound2, weight_init_bound2, n_features)
         
-        self.coef_hidden_ = rng.uniform(-1, 1, (n_features, self.n_hidden))
-        self.coef_output_ = rng.uniform(-1, 1, (self.n_hidden, n_features))
-        self.intercept_hidden_ = rng.uniform(-1, 1, self.n_hidden)
-        self.intercept_output_ = rng.uniform(-1, 1, n_features)
+        #self.coef_hidden_ = np.array([[0.12, 0.13], [0.12, 0.13]])
+        #self.coef_output_ = np.array([[0.12, 0.13], [0.12, 0.13]])
+        #self.intercept_hidden_ = np.array([0.5, 0.4])
+        #self.intercept_output_ = np.array([0.12, 0.6])
 
     def _init_param(self):
         """Sets the activation, derivative, loss and output functions."""      
         # output for non-linear
         if self.decoder=='non_linear':
-            self.output_func =  logistic_sigmoid
+            self.output_func =  logistic
             self.output_derivative = _d_logistic
         # output for linear
         if self.decoder=='linear':
@@ -270,12 +281,12 @@ class Autoencoder(BaseEstimator, TransformerMixin):
         -------
         self
         """
+        X = check_array(X)
         #X = atleast2d_or_csr(X, dtype=np.float64, order="C")
         n_samples, n_features = X.shape
         self._init_fit(n_features)
         self._init_param()
         self._init_t_eta_()
-        X,y=check_X_y(X,y, dtype=np.float64, order="C")
         
         if self.shuffle_data:
             X, y = shuffle(X, y, random_state=self.random_state)
@@ -303,7 +314,7 @@ class Autoencoder(BaseEstimator, TransformerMixin):
                     for batch_slice in batch_slices:
                         cost = self.backprop_sgd(
                             X[batch_slice],
-                            n_features, self.batch_size,
+                            n_features, batch_size,
                             delta_o, a_hidden, a_output)
                     if self.verbose:
                         print("Iteration %d, cost = %.2f"
@@ -352,6 +363,7 @@ class Autoencoder(BaseEstimator, TransformerMixin):
        -------
        [1] http://ufldl.stanford.edu/wiki/index.php/Autoencoders_and_Sparsity
         """
+
         # Forward propagate
         a_hidden[:] = self.activation_func(safe_sparse_dot(X, self.coef_hidden_)
                                       + self.intercept_hidden_)
@@ -368,7 +380,7 @@ class Autoencoder(BaseEstimator, TransformerMixin):
         # Backward propagate
         diff = X - a_output
         #Linear decoder
-        delta_o[:] = -diff * self.output_derivative(a_output)
+        delta_o[:] = -diff
 
         delta_h = (
             (safe_sparse_dot(delta_o, self.coef_output_.T) +
@@ -377,7 +389,7 @@ class Autoencoder(BaseEstimator, TransformerMixin):
             
         # Get cost 
         cost = np.sum(diff ** 2) / (2 * n_samples)
-        
+        #print 'cost1', cost
         # Add regularization term to cost 
         cost += (0.5 * self.alpha) * (
             np.sum(self.coef_hidden_ ** 2) + np.sum(
