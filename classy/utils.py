@@ -165,12 +165,12 @@ def plot_feature_combinations(data,feature_names=None,figsize=(20,20)):
                 ax.set_xticklabels([])
 
 
-def plot2D(data,classifier=None,axis_range=None,number_of_grid_points=100,legend_location='best'):
+def plot2D(data,classifier=None,axis_range=None,
+    number_of_grid_points=100,legend_location='best'):
 
     import numpy as np
     import pylab as pl
     from matplotlib.lines import Line2D
-
 
     from matplotlib.colors import ListedColormap
 
