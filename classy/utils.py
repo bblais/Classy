@@ -3,6 +3,7 @@ mpl.rcParams['lines.linewidth'] = 3
 mpl.rcParams['figure.figsize'] = (10,8)
 mpl.rcParams['axes.grid']=True
 
+
 def bigfonts(size=20,family='sans-serif'):
 
     from matplotlib import rc
@@ -43,6 +44,7 @@ def standardize(data):
     
 
 def cross_validation(cl,vectors,targets,cv=5):
+    from numpy import mean,std,sqrt
     from sklearn.cross_validation import cross_val_score
     scores = cross_val_score(cl, vectors, targets, cv=cv)
     estimate=mean(scores)
