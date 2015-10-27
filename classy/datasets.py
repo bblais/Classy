@@ -563,7 +563,7 @@ def random_vector(data,targets=None):
     from random import choice
     from numpy import where
     if targets is None:
-        return random.choice(data.vectors)
+        return choice(data.vectors)
     
     if isinstance(targets,str):
         targets=[targets]
@@ -573,7 +573,7 @@ def random_vector(data,targets=None):
         t=data.target_names.index(name)
         idx.extend(where(data.targets==t)[0])
 
-    i=random.choice(idx)
+    i=choice(idx)
     return data.vectors[i]
 
 def extract_features(data,idx):

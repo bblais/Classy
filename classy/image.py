@@ -1,4 +1,4 @@
-import Image
+from PIL import Image
 from Struct import Struct
 import os
 import glob
@@ -122,6 +122,8 @@ def load_images_from_filepatterns(**kwargs):
     
     for fname in data.files:
         im=Image.open(fname)
+        if im.mode=='1' or im.mode=='LA':
+            im=im.convert('L')
         ima=np.asarray(im)
         data.data.append(ima)
         
@@ -149,6 +151,11 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
 
         try:
             im=Image.open(fname)
+            if im.mode=='LA':
+                im=im.convert('L')
+            if im.mode=='RGBA':
+                im=im.convert('RGB')
+
         except IOError:
             print "failed to open %s" % fname
             
@@ -235,7 +242,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
     size=None
     for fname in data.files:
         im=Image.open(fname)
-        if im.mode=='1':
+        if im.mode=='1' or im.mode=='LA':
             im=im.convert('L')
 
         ima=np.asarray(im)
