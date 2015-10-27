@@ -86,7 +86,7 @@ def load_images_from_filepatterns(**kwargs):
     
     filenames={}
     verbose=None
-    for key in kwargs:
+    for key in sorted(kwargs):
         if key=='verbose':
             verbose=kwargs[key]
             continue
