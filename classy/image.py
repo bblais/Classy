@@ -192,7 +192,7 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
             
 
 
-def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbose=True):
+def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbose=True,make_grayscale=False):
     data=Struct()
     data.DESCR="Images"
     data.files=[]
@@ -245,6 +245,9 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
         if im.mode=='1' or im.mode=='LA':
             im=im.convert('L')
 
+        if make_grayscale:
+            im=im.convert('L')
+            
         ima=np.asarray(im)
 
         if size is None:
