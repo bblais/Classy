@@ -1,0 +1,80 @@
+
+from classy import text
+
+count,feature_names=text.count_letters('data/languages/E3.txt')
+print count,feature_names
+
+
+count,feature_names=text.count_letters('data/languages/E3.txt')
+print count,feature_names
+p=text.letter_freq('English',feature_names)
+print p
+
+print sum(count*log10(p))
+
+C=text.LanguageFileClassifier()
+
+result=C.loglikelihood('data/languages/E*.txt',verbose=True)
+
+C.predict('data/languages/E*',verbose=True)
+
+[C.target_names[i] for i in C.predict('data/languages/E*')]
+
+from classy import text
+
+train=text.load_files('data/newsgroups/train',verbose=True)
+test=text.load_files('data/newsgroups/test',verbose=True)
+
+train,test=text.text_to_vectors('data/newsgroups/train','data/newsgroups/test',verbose=True)
+
+train.vectors
+
+v=array(train.vectors[0,:].todense()).ravel()
+
+v.max()
+
+v.shape
+
+v=array(train.vectors[0,:].todense()).ravel()
+plot(v,'.')
+v=array(train.vectors[2000,:].todense()).ravel()
+plot(v,'.')
+xlabel('feature number')
+ylabel('frequency of feature')
+
+C=text.Multinomial()
+
+C.fit(train.vectors,train.targets)
+
+C.predict(test.vectors)
+
+C.percent_correct(test.vectors,test.targets)
+
+from classy import *
+
+train_files=text.load_files('data/films/train',verbose=True)
+test_files=text.load_files('data/films/test',verbose=True)
+
+train_data,test_data=text.text_to_vectors(train_files,test_files,verbose=True)
+
+train_data.vectors
+
+vectors_to_image(train_data.vectors,binary=True)
+
+vectors_to_image(train_data.vectors,binary=False)
+
+from classy import text
+
+train_files=text.load_files('data/films/train',verbose=True)
+test_files=text.load_files('data/films/test',verbose=True)
+
+train_data,test_data=text.text_to_vectors(train_files,test_files,verbose=True)
+
+train_data.vectors
+
+train_data,test_data=text.text_to_vectors(train_files,test_files,ngram_range=(1,2),verbose=True)
+train_data.vectors
+
+print train_data.feature_names[:100]
+
+

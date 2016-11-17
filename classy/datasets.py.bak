@@ -1,6 +1,6 @@
 import numpy as np
 import sklearn.datasets
-from .Struct import Struct
+from Struct import Struct
 from sklearn.feature_extraction import DictVectorizer
 from copy import deepcopy as copy_data
 
@@ -223,7 +223,7 @@ def load_excel(fname,max_lines=None,sparse=False,verbose=True,sheet=None):
         sh = book.sheet_by_name(sheet)
 
     if verbose:
-        print(sh.name, sh.nrows, sh.ncols)
+        print sh.name, sh.nrows, sh.ncols
 
     mapping=[]
     targets=[]
@@ -315,7 +315,7 @@ def load_excel_orig(fname,max_lines=None,verbose=True,sheet=None):
         sh = book.sheet_by_name(sheet)
 
     if verbose:
-        print(sh.name, sh.nrows, sh.ncols)
+        print sh.name, sh.nrows, sh.ncols
     
     vectors=[]
     targets=[]
@@ -407,7 +407,7 @@ def vectors_to_image(vectors,binary=False,axis='square'):
     elif axis=='equal':
         aspect=1
     else:
-        raise ValueError("Unknown axis option %s" % str(axis))
+        raise ValueError,"Unknown axis option %s" % str(axis)
 
     pl.imshow(vectors,cmap=pl.cm.gray,aspect=aspect,interpolation='nearest')
     
@@ -418,54 +418,54 @@ def summary(data):
     from scipy.sparse import issparse
     
     if "DESCR" in data and data.DESCR=="Images":
-        print("Images")
-        print("%d images of shape %s" % (len(data.data),str(data.data[0].shape)))
+        print "Images"
+        print "%d images of shape %s" % (len(data.data),str(data.data[0].shape))
     
         try:
             if not data.targets is None:
                 data.targets
-                print("Target values given.")
+                print "Target values given."
             else:
-                print("No Target values.")
+                print "No Target values."
         except (KeyError,AttributeError):
-                print("No Target values.")
+                print "No Target values."
                 
         try:            
-            print("Target names:", end=' ')
+            print "Target names:",
             if data.target_names:
-                print(", ".join(["'%s'" % name for name in data.target_names]))
+                print ", ".join(["'%s'" % name for name in data.target_names])
             else:
-                print("[None]")
+                print "[None]"
         except (KeyError,AttributeError):
             pass
     elif "DESCR" in data and data.DESCR=="Sequences":
-        print("Sequences")
-        print("%d sequences of median length %d" % (len(data.data),
-                                    np.median([len(_) for _ in data.data])))
+        print "Sequences"
+        print "%d sequences of median length %d" % (len(data.data),
+                                    np.median([len(_) for _ in data.data]))
                                     
-        print("Unique letters:",np.unique(''.join(data.data)))
+        print "Unique letters:",np.unique(''.join(data.data))
         try:            
-            print("Target names:", end=' ')
+            print "Target names:",
             if data.target_names:
-                print(", ".join(["'%s'" % name for name in data.target_names]))
+                print ", ".join(["'%s'" % name for name in data.target_names])
             else:
-                print("[None]")
+                print "[None]"
         except (KeyError,AttributeError):
             pass
         
     else:
 
-        print("%d vectors of length %d" % (data.vectors.shape[0],data.vectors.shape[1]))
+        print "%d vectors of length %d" % (data.vectors.shape[0],data.vectors.shape[1])
         try:
-            print("Feature names:", end=' ')
+            print "Feature names:",
             
             if len(data.feature_names)<15:            
-                print(", ".join(["'%s'" % name for name in data.feature_names]))
+                print ", ".join(["'%s'" % name for name in data.feature_names])
             else:
-                print(", ".join(["'%s'" % name for name in data.feature_names[:5]]), end=' ')
-                print(" , ... , ", end=' ')
-                print(", ".join(["'%s'" % name for name in data.feature_names[-5:]]), end=' ')
-                print(" (%d features)" % (len(data.feature_names)))
+                print ", ".join(["'%s'" % name for name in data.feature_names[:5]]),
+                print " , ... , ",
+                print ", ".join(["'%s'" % name for name in data.feature_names[-5:]]),
+                print " (%d features)" % (len(data.feature_names))
                 
         except (KeyError,AttributeError):
             pass
@@ -473,30 +473,30 @@ def summary(data):
         try:
             if not data.targets is None:
                 data.targets
-                print("Target values given.")
+                print "Target values given."
             else:
-                print("No Target values.")
+                print "No Target values."
         except (KeyError,AttributeError):
             pass
         try:
-            print("Target names:", end=' ')
+            print "Target names:",
             if data.target_names:
-                print(", ".join(["'%s'" % name for name in data.target_names]))
+                print ", ".join(["'%s'" % name for name in data.target_names])
             else:
-                print("[None]")
+                print "[None]"
         except (KeyError,AttributeError):
             pass
 
-        print("Mean: ",data.vectors.mean(axis=0))
+        print "Mean: ",data.vectors.mean(axis=0)
         if not issparse(data.vectors):
-            print("Median: ",np.median(data.vectors,axis=0))
-            print("Stddev: ",np.std(data.vectors,axis=0))        
+            print "Median: ",np.median(data.vectors,axis=0)
+            print "Stddev: ",np.std(data.vectors,axis=0)        
         
         
     
 def save_ssdf(fname,data):
-    from . import ssdf
-    from .Struct import Struct
+    import ssdf
+    from Struct import Struct
 
     data=Struct(data)
     
@@ -513,8 +513,8 @@ def save_ssdf(fname,data):
     ssdf.save(fname,dict(data))
     
 def load_ssdf(fname,verbose=True):
-    from . import ssdf
-    from .Struct import Struct
+    import ssdf
+    from Struct import Struct
     s=ssdf.load(fname)
     data=Struct(s.__dict__)
     data.targets=np.array(data.targets)
@@ -553,9 +553,9 @@ def split(data,test_size=None,train_size=None,verbose=True):
         d2.vectors=v2
 
     if verbose:
-        print("Original vector shape: ",data.vectors.shape)
-        print("Train vector shape: ",d1.vectors.shape)
-        print("Test vector shape: ",d2.vectors.shape)
+        print "Original vector shape: ",data.vectors.shape
+        print "Train vector shape: ",d1.vectors.shape
+        print "Test vector shape: ",d2.vectors.shape
 
     return d1,d2        
         

@@ -1,5 +1,5 @@
 import classy.datasets
-from .Struct import Struct
+from Struct import Struct
 import os
 import glob
 import numpy as np
@@ -30,12 +30,12 @@ def load_sequences(fname,sheet=None,verbose=True):
         if parts[-1].lower().startswith('categor') or parts[-1].lower().startswith('target'):
             with_target=True
             if verbose:
-                print("Target Column Found")
+                print "Target Column Found"
             
             assert len(parts)==2
         else:
             if verbose:
-                print("Target Column Not Found")
+                print "Target Column Not Found"
             with_target=False
             assert len(parts)==1
             
@@ -59,7 +59,7 @@ def load_sequences(fname,sheet=None,verbose=True):
             else:
                 target=None
     else:
-        raise ValueError("%s file not implemented" % ext)
+        raise ValueError,"%s file not implemented" % ext
         
     if with_target:
         target_names=sorted(list(set(targets)))
@@ -191,7 +191,7 @@ def sequences_to_vectors(origdata,testdata=None,chunksize=5,verbose=True):
         
         if verbose:
             classy.datasets.summary(data1)
-            print("===")
+            print "==="
             classy.datasets.summary(data2)
         
         

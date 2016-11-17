@@ -1,9 +1,9 @@
-
+from __future__ import division
 import numpy as np
 import pylab as pl
-from . import utils
+import utils
 from sklearn.utils import check_X_y,check_array
-from .multilayer_perceptron  import MultilayerPerceptronClassifier
+from multilayer_perceptron  import MultilayerPerceptronClassifier
 from sklearn.utils.extmath import safe_sparse_dot
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression as LogReg
@@ -30,10 +30,8 @@ class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
             kwargs['tol']=1e-7
     
         MultilayerPerceptronClassifier.__init__(self,**kwargs)
-        self.equivalent={'weights':'layers_coef_',
-        }
-                         
-        self.__dict__.update(self.equivalent)
+        self.equivalent={
+                        }
         
     def fit(self,*args,**kwargs):
             
@@ -176,7 +174,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         except AttributeError:
             pass
         
-        center=np.array(center,dtype=np.float)
+        center=check_array(center,dtype=np.float)
         radius=np.array([radius],dtype=np.float)
         target=np.array([target],dtype=np.int)
         if len(self.centers_)==0:
@@ -206,8 +204,6 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         # first pass
         pass_number=0
         for v,t in zip(X,y):  # Go through all of the data points
-            v=v.reshape(1, -1)
-
             if len(self.centers_)==0:
                 self._add_center(v,self.r_max,t)
                 continue
@@ -221,15 +217,13 @@ class RCEsk(BaseEstimator, ClassifierMixin):
                 continue
         pass_number+=1
         if self.verbose:
-            print("%d clusters." % (len(self.centers_)))
+            print "%d clusters." % (len(self.centers_))
 
         # second pass
         stop=False
         while not stop:
             old_radii_=self.radii_.copy()
             for v,t in zip(X,y):  # Go through all of the data points (again) 
-                v=v.reshape(1, -1)
-
                 D=pairwise_distances(v,self.centers_,metric=self.metric).ravel()
                 within_centers=(D<self.radii_)
                 matched=(t==self.targets_) & (within_centers)
@@ -248,7 +242,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
             pass_number+=1
             
             if self.verbose:
-                print("%d clusters." % (len(self.centers_)))
+                print "%d clusters." % (len(self.centers_))
             if len(old_radii_)!=len(self.radii_):
                 continue
             # Repeat until no changes    
@@ -263,8 +257,6 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         
         result=[]
         for vector in X:
-            vector=vector.reshape(1, -1)
-
             D=pairwise_distances(vector, self.centers_, metric=self.metric)/self.radii_
             result.append(self.targets_[D.argmin()])
             
@@ -317,7 +309,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         except AttributeError:
             pass
 
-        center=np.array(center,dtype=np.float)
+        center=check_array(center,dtype=np.float)
         radius=np.array([radius],dtype=np.float)
         target=np.array([target],dtype=np.int)
         if len(self.centers_)==0:
@@ -350,8 +342,6 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         pass_number=0
         i=0
         for v,t in zip(X,y):  
-            v=v.reshape(1, -1)
-
             D=pairwise_distances(v,X).ravel()
             r=max(D[y!=t].min()-1e-10,1e-10)
             radii.append(r)
@@ -369,7 +359,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
             #Select the sphere that contains that point, 
             # and the largest number of other points, 
             # and add it to the final spheres list
-            v=v.reshape(1, -1)
+        
             D=pairwise_distances(v,X).ravel()
             within_centers=(D<=radii)
             matched=(t==y) & (within_centers)
@@ -389,7 +379,6 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         
         result=[]
         for vector in X:
-            vector=vector.reshape(1, -1)
             D=pairwise_distances(vector, self.centers_, metric=self.metric)/self.radii_
             result.append(self.targets_[D.argmin()])
             

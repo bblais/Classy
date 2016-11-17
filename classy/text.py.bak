@@ -1,4 +1,4 @@
-from .Struct import Struct
+from Struct import Struct
 from numpy import array,log10
 
 letters=[chr(x) for x in range(ord('a'),ord('z')+1)]
@@ -114,7 +114,7 @@ def letter_freq(language='English',feature_names=letters):
         
         
     else:
-        raise ValueError("Language %s not implemented" % language)
+        raise ValueError,"Language %s not implemented" % language
      
 from sklearn.feature_extraction.text import CountVectorizer  
    
@@ -131,7 +131,7 @@ def count_letters(filenames):
     for filename in filenames:
         with open(filename) as fid:
             mytext=fid.read()
-            #mytext=mytext.decode('utf8','ignore')            
+            mytext=mytext.decode('utf8','ignore')            
             text.append(mytext)
         
     X=vectorizer.fit_transform(text).toarray()
@@ -156,7 +156,7 @@ class LanguageFileClassifier(object):
         results=[]
         for filename in filenames:
             if verbose:
-                print(filename)
+                print filename
                 
             count,feature_names=count_letters(filename)
             result=[]
@@ -167,7 +167,7 @@ class LanguageFileClassifier(object):
                     value=(log10(p)*count).sum()
                 result.append(value)
                 if verbose:
-                    print("\t%s: %f" % (lang,value))
+                    print "\t%s: %f" % (lang,value)
                 
             results.append(result)
 
@@ -190,10 +190,11 @@ def load_files(dirname,verbose=False):
     
     data=sklearn.datasets.load_files(dirname,encoding='utf8',decode_error='ignore',shuffle=False)
     data.targets=data.target
+    del data.target
     
     if verbose:
-        print(len(data.filenames)," filenames")
-        print(data.target_names, " target names")
+        print len(data.filenames)," filenames"
+        print data.target_names, " target names"
     
     return data
 

@@ -11,8 +11,8 @@ from scipy.optimize import fmin_l_bfgs_b
 import warnings
 from sklearn.utils import check_X_y,check_array
 
-from .base import logistic, softmax, binary_KL_divergence
-from .base import ACTIVATIONS, DERIVATIVES, LOSS_FUNCTIONS
+from base import logistic, softmax, binary_KL_divergence
+from base import ACTIVATIONS, DERIVATIVES, LOSS_FUNCTIONS
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.base import TransformerMixin
 from sklearn.externals import six
@@ -419,8 +419,8 @@ class BaseMultilayerPerceptron(six.with_metaclass(ABCMeta, BaseEstimator)):
                 self.t_ += n_samples
 
                 if self.verbose:
-                    print(("Iteration %d, cost = %.8f" % (self.n_iter_,
-                                                         self.cost_)))
+                    print("Iteration %d, cost = %.8f" % (self.n_iter_,
+                                                         self.cost_))
 
                 if self.cost_ > prev_cost:
                     cost_increase_count += 1

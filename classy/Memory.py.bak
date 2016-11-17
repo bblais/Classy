@@ -1,6 +1,6 @@
 """Convenient wrapper around ssdf"""
 
-from . import ssdf
+import ssdf
 import gzip
 import os
 from numpy import array,iterable
@@ -19,7 +19,7 @@ def Struct2Dict(S):
     if isinstance(S,ssdf.Struct):
         d={}
         for key in S:
-            if isinstance(key,str):  # get rid of unicode!
+            if isinstance(key,unicode):  # get rid of unicode!
                 key2=str(key)
             else:
                 key2=key
@@ -127,9 +127,9 @@ if __name__ == "__main__":
     filename = sys.argv[1]
     if os.path.isfile(filename):
         o = load(filename)
-        print("Loaded %s" % o)
+        print "Loaded %s" % o
     else:
         o = Object()
         save(o, filename)
-        print("Saved %s" % o)
+        print "Saved %s" % o
 

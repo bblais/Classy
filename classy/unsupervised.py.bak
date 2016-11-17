@@ -1,11 +1,11 @@
 from sklearn.utils.extmath import safe_sparse_dot
-from . import autoencoder
+import autoencoder
 from sklearn.utils import check_X_y,check_array
-from .autoencoder import Autoencoder as AutoEncoder
+from autoencoder import Autoencoder as AutoEncoder
 from sklearn.decomposition import RandomizedPCA
-from .multilayer_perceptron  import MultilayerPerceptronAutoencoder
+from multilayer_perceptron  import MultilayerPerceptronAutoencoder
 from numpy import array
-from .datasets import Struct
+from datasets import Struct
 from copy import deepcopy
 
 class GenericFilter(object):
@@ -101,7 +101,7 @@ class AutoEncoder(MultilayerPerceptronAutoencoder,GenericFilter):
         weights=self.weights_xh.T
         
         if only is None:
-            only=list(range(len(weights)))
+            only=range(len(weights))
     
         L=len(only)
         c=ceil(sqrt(L))
@@ -120,7 +120,7 @@ class AutoEncoder(MultilayerPerceptronAutoencoder,GenericFilter):
         weights=self.weights_xh.T
         
         if only is None:
-            only=list(range(len(weights)))
+            only=range(len(weights))
     
         L=len(only)
         c=ceil(sqrt(L))
@@ -198,7 +198,7 @@ class PCA(RandomizedPCA,GenericFilter):
     
     
         if only is None:
-            only=list(range(len(self.weights)))
+            only=range(len(self.weights))
     
         L=len(only)
         c=ceil(sqrt(L))
@@ -214,7 +214,7 @@ class PCA(RandomizedPCA,GenericFilter):
     def imshow(self,shape,only=None):
         from pylab import subplot,imshow,cm,title,sqrt,ceil
         if only is None:
-            only=list(range(len(self.weights)))
+            only=range(len(self.weights))
     
         L=len(only)
         c=ceil(sqrt(L))

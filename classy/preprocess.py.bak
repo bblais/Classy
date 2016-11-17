@@ -1,5 +1,5 @@
 import classy.datasets
-from .Struct import Struct
+from Struct import Struct
 import numpy as np
 from numpy import sqrt,sum,exp,pi,min,max,linspace
 

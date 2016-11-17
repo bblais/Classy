@@ -1,13 +1,13 @@
-from datasets import *
-from supervised import *
-from unsupervised import *
-from utils import *
-import datasets
-import text
-import image
-import sound
-import bio
-import preprocess
+from .datasets import *
+from .supervised import *
+from .unsupervised import *
+from .utils import *
+from . import datasets
+from . import text
+from . import image
+from . import sound
+from . import bio
+from . import preprocess
 
 __version__='0.0.15'
-print "Version: ",__version__
+print("Version: ",__version__)

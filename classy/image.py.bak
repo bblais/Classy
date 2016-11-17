@@ -1,5 +1,5 @@
 from PIL import Image
-from .Struct import Struct
+from Struct import Struct
 import os
 import glob
 import numpy as np
@@ -11,7 +11,7 @@ def show_images(images,which_images=None,max_images=None):
     from random import shuffle
     
     if which_images is None:
-        which_images=list(range(len(images.data)))
+        which_images=range(len(images.data))
         
     if isinstance(which_images[0],str):  # target names
         which_names=which_images
@@ -28,7 +28,7 @@ def show_images(images,which_images=None,max_images=None):
         
         
     if not which_images:
-        raise ValueError("No images selected")
+        raise ValueError,"No images selected"
         
     L=len(which_images)
     c=ceil(sqrt(L))
@@ -56,7 +56,7 @@ def show_image_vector(vector,shape):
     imshow(im,interpolation='nearest',cmap=gray)
 
 def vector_to_image(vector,shape,fname=None):
-    from PIL import Image
+    import Image
     from matplotlib.pyplot import imshow
     from matplotlib.cm import gray
     
@@ -106,15 +106,15 @@ def load_images_from_filepatterns(**kwargs):
         verbose=True
         
     if not data.target_names:
-        print("No images matching the patterns found.")
+        print "No images matching the patterns found."
         return None
         
     for i,name in enumerate(data.target_names):
         values=filenames[name]
         if verbose:
-            print("[%s]: %d files found" % (name,len(values)))
+            print "[%s]: %d files found" % (name,len(values))
             for v in values:
-                print("\t%s" % v)
+                print "\t%s" % v
         
         data.files.extend(values)
         data.targets.extend([i]*len(values))
@@ -157,7 +157,7 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
                 im=im.convert('RGB')
 
         except IOError:
-            print("failed to open %s" % fname)
+            print "failed to open %s" % fname
             
         im_orig=im
         
@@ -168,7 +168,7 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
             im=im.convert(mode[colormode])
             
         if im is im_orig:
-            print("%s: size %s mode %s" % (fname,im.size,revmode.get(im.mode,im.mode)))
+            print "%s: size %s mode %s" % (fname,im.size,revmode.get(im.mode,im.mode))
         else:
             newfname=os.path.join(newdirname,fname)
             if not ext is None:
@@ -176,13 +176,13 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
                 ext="."+ext
                 newfname,oldext=os.path.splitext(newfname)
                 newfname=newfname+ext
-            print("%s: size %s mode %s -> %s: size %s mode %s" % (fname,
+            print "%s: size %s mode %s -> %s: size %s mode %s" % (fname,
                                                   im_orig.size,
                                                   revmode.get(im_orig.mode,im_orig.mode),
                                                   newfname,
                                                   im.size,
                                                   revmode.get(im.mode,im.mode),
-                                                  ))
+                                                  )
                 
             dname,junk=os.path.split(newfname)
             if not os.path.exists(dname):
@@ -212,11 +212,11 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
             values=glob.glob(files_filter)
             if not max_per_folder is None:
                 if verbose:
-                    print("[%s]: %d files found...%s used." % (name,len(values),max_per_folder))
+                    print "[%s]: %d files found...%s used." % (name,len(values),max_per_folder)
                 values=values[:max_per_folder]
             else:
                 if verbose:
-                    print("[%s]: %d files found" % (name,len(values)))
+                    print "[%s]: %d files found" % (name,len(values))
             
             data.files.extend(values)
             data.targets.extend([i]*len(values))
@@ -229,11 +229,11 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
         values=glob.glob(files_filter)
         if not max_per_folder is None:
             if verbose:
-                print("[%s]: %d files found...%s used." % (name,len(values),max_per_folder))
+                print "[%s]: %d files found...%s used." % (name,len(values),max_per_folder)
             values=values[:max_per_folder]
         else:
             if verbose:
-                print("[%s]: %d files found" % (name,len(values)))
+                print "[%s]: %d files found" % (name,len(values))
         
         data.files.extend(values)
 
@@ -259,7 +259,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
         data.data.append(ima)
         
     if not all_same_size:
-        print("Warning: not all images the same size.")
+        print "Warning: not all images the same size."
 
     return data
 
@@ -275,7 +275,7 @@ def images_to_vectors(origdata,truncate=False,verbose=True):
             
         if im.shape!=smallest_shape:
             if not truncate:
-                raise ValueError('Not all images have the same shape')
+                raise ValueError,'Not all images have the same shape'
             smallest_shape=[min(x,y) for x,y in zip(im.shape,smallest_shape)]
             same_shape=False
             
@@ -294,7 +294,7 @@ def images_to_vectors(origdata,truncate=False,verbose=True):
             elif len(smallest_shape)==3:
                 ima=ima[:smallest_shape[0],:smallest_shape[1],:smallest_shape[2]]
             else:
-                raise ValueError(">3D shapes not supported")
+                raise ValueError,">3D shapes not supported"
                 
         vec=ima.ravel()
         vec=vec.astype(np.float)
@@ -487,7 +487,7 @@ def images_to_random_pixel_vectors(origdata,number_of_pixels,maximum_points=None
                 data.targets.append(target)
             data.original_vector_number.append(k)
             
-    data.feature_names=list(range(sz))
+    data.feature_names=range(sz)
     
     data.vectors=np.array(data.vectors)
     if not target is None:

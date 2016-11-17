@@ -102,12 +102,12 @@ def timeit(reset=False):
         # is defined
     except NameError:
         _timeit_time=time()
-        print("Time Reset")
+        print "Time Reset"
         return
     
     if reset:
         _timeit_time=time()
-        print("Time Reset")
+        print "Time Reset"
         return
 
     return time2str(time()-_timeit_time)
@@ -140,7 +140,7 @@ def plot_feature_combinations(data,feature_names=None,figsize=(20,20)):
                 if not data.targets is None:
                     lines=[]
                     for ti,t in enumerate(data.target_names):
-                        line = Line2D(list(range(2)), list(range(2)), linestyle='-', marker='o',color=cmap_bold.colors[ti])
+                        line = Line2D(range(2), range(2), linestyle='-', marker='o',color=cmap_bold.colors[ti])
                         lines.append(line)
         
                     pl.legend(lines,data.target_names,loc='center')
@@ -213,7 +213,7 @@ def plot2D(data,classifier=None,axis_range=None,
     if not data.targets is None:
         lines=[]
         for ti,t in enumerate(data.target_names):
-            line = Line2D(list(range(2)), list(range(2)), linestyle='-', marker='o',color=cmap_bold.colors[ti])
+            line = Line2D(range(2), range(2), linestyle='-', marker='o',color=cmap_bold.colors[ti])
             lines.append(line)
         
         if not legend_location is None:

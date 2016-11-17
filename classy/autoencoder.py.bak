@@ -8,7 +8,7 @@ import numpy as np
 
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.linalg import norm
-from itertools import cycle
+from itertools import cycle, izip
 from sklearn.utils import check_X_y,check_array
 from sklearn.utils import check_random_state
 from sklearn.utils import gen_even_slices
@@ -16,7 +16,7 @@ from sklearn.utils import shuffle
 from sklearn.utils.extmath import safe_sparse_dot
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.extmath import safe_sparse_dot
-from .base import logistic, softmax, binary_KL_divergence
+from base import logistic, softmax, binary_KL_divergence
 
 def _identity(X):
     """returns the same input array."""
@@ -310,15 +310,15 @@ class Autoencoder(BaseEstimator, TransformerMixin):
         if self.algorithm == 'sgd':
             prev_cost = np.inf
             
-            for i in range(self.max_iter):
+            for i in xrange(self.max_iter):
                     for batch_slice in batch_slices:
                         cost = self.backprop_sgd(
                             X[batch_slice],
                             n_features, batch_size,
                             delta_o, a_hidden, a_output)
                     if self.verbose:
-                        print(("Iteration %d, cost = %.2f"
-                              % (i, cost)))
+                        print("Iteration %d, cost = %.2f"
+                              % (i, cost))
                     if abs(cost - prev_cost) < self.tol:
                         break
                     prev_cost = cost

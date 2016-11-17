@@ -16,7 +16,7 @@ class Struct(dict):
 
 if __name__=="__main__":
 
-    from .Memory import *
+    from Memory import *
     
     s=Struct({'hello':5})
     
