@@ -30,7 +30,7 @@ class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
             kwargs['tol']=1e-7
     
         MultilayerPerceptronClassifier.__init__(self,**kwargs)
-        self.equivalent={'weights':'layers_coef_',
+        self.equivalent={'weights':'coefs_',
         }
                          
         self.__dict__.update(self.equivalent)
@@ -138,8 +138,8 @@ class NaiveBayes(GaussianNB,GenericClassifier):
 from sklearn.linear_model import Perceptron as skPerceptron
 class Perceptron(skPerceptron,GenericClassifier):
 
-    def __init__(self,number_of_iterations=50):
-        skPerceptron.__init__(self,shuffle=True,n_iter=number_of_iterations)
+    def __init__(self,number_of_iterations=50,tol=1e-3):
+        skPerceptron.__init__(self,shuffle=True,max_iter=number_of_iterations,tol=tol)
         
         self.equivalent={'weights':'coef_',
                          'biases':'intercept_',
