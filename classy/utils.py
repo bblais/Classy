@@ -45,7 +45,7 @@ def standardize(data):
 
 def cross_validation(cl,vectors,targets,cv=5):
     from numpy import mean,std,sqrt
-    from sklearn.cross_validation import cross_val_score
+    from sklearn.model_selection import cross_val_score
     scores = cross_val_score(cl, vectors, targets, cv=cv)
     estimate=mean(scores)
     estimate_err=2*std(scores)/sqrt(len(scores))
@@ -54,7 +54,7 @@ def cross_validation(cl,vectors,targets,cv=5):
     return scores, result
 
 def leaveoneout_cross_validation(cl,vectors,targets):
-    from sklearn.cross_validation import LeaveOneOut
+    from sklearn.model_selection import LeaveOneOut
     return cross_validation(cl,vectors,targets,cv=LeaveOneOut(len(vectors)))
 
 def time2str(t):

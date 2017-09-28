@@ -530,7 +530,7 @@ def load_ssdf(fname,verbose=True):
     return data    
     
 def split(data,test_size=None,train_size=None,verbose=True):
-    from sklearn.cross_validation import train_test_split
+    from sklearn.model_selection import train_test_split
     from copy import deepcopy
 
     d1=Struct(split=True)
