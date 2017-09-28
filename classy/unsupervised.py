@@ -1,9 +1,9 @@
 from sklearn.utils.extmath import safe_sparse_dot
 from . import autoencoder
 from sklearn.utils import check_X_y,check_array
-from .autoencoder import Autoencoder as AutoEncoder
+from .autoencoder import Autoencoder 
 from sklearn.decomposition import RandomizedPCA
-from .multilayer_perceptron  import MultilayerPerceptronAutoencoder
+#from .multilayer_perceptron  import MultilayerPerceptronAutoencoder
 from numpy import array
 from .datasets import Struct
 from copy import deepcopy
@@ -41,7 +41,7 @@ class GenericFilter(object):
         return new_data
 
 
-class AutoEncoder(MultilayerPerceptronAutoencoder,GenericFilter):
+class AutoEncoder(Autoencoder,GenericFilter):
 
     def __init__(self,*args,**kwargs):    
         MultilayerPerceptronAutoencoder.__init__(self,*args,**kwargs)

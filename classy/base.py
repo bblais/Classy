@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from sklearn.utils.fixes import expit as logistic_sigmoid
+#from sklearn.utils.fixes import expit as logistic_sigmoid
 
 
 def identity(X):
@@ -39,7 +39,10 @@ def logistic(X):
     X_new : {array-like, sparse matrix}, shape (n_samples, n_features)
         The transformed data.
     """
-    return logistic_sigmoid(X, out=X)
+    # 1 / (1 + exp(-x)).
+    np.exp(-X,out=X)
+    X[:]=1/(1+X)
+    return X
 
 
 def tanh(X):

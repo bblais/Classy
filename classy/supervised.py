@@ -3,7 +3,7 @@ import numpy as np
 import pylab as pl
 from . import utils
 from sklearn.utils import check_X_y,check_array
-from .multilayer_perceptron  import MultilayerPerceptronClassifier
+from sklearn.neural_network import MLPClassifier as MultilayerPerceptronClassifier
 from sklearn.utils.extmath import safe_sparse_dot
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression as LogReg
