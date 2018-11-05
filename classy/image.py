@@ -125,6 +125,10 @@ def load_images_from_filepatterns(**kwargs):
         if im.mode=='1' or im.mode=='LA':
             im=im.convert('L')
         ima=np.asarray(im)
+
+        if len(ima.shape)==3:
+            ima=ima[:,:,:3]  # take out the alpha channel if it exists
+
         data.data.append(ima)
         
     return data
@@ -249,6 +253,9 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
             im=im.convert('L')
             
         ima=np.asarray(im)
+
+        if len(ima.shape)==3:
+            ima=ima[:,:,:3]  # take out the alpha channel if it exists
 
         if size is None:
             size=ima.shape
