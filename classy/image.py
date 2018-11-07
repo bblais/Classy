@@ -427,7 +427,7 @@ def images_to_patch_vectors(origdata,patch_size,max_patches=None,overlap=True,
         data.targets=None
 
 
-    L=prod(patch_size)
+    L=np.prod(patch_size)
     if len(data.vectors[0])==L:  # 1 channel
         data.feature_names=['%d' % _i for _i in range(L)]
     elif len(data.vectors[0])==3*L:  # 3 channels:
@@ -435,7 +435,7 @@ def images_to_patch_vectors(origdata,patch_size,max_patches=None,overlap=True,
     elif len(data.vectors[0])==4*L:  # 4 channels:
         data.feature_names=['r%d' % _i for _i in range(L)]+['g%d' % _i for _i in range(L)]+['b%d' % _i for _i in range(L)]+['a%d' % _i for _i in range(L)]
     else:
-        data.feature_names=['%d' % _i for _i in range(data.vectors[0])]
+        data.feature_names=['%d' % _i for _i in range(len(data.vectors[0]))]
     if verbose:
         classy.datasets.summary(data)
     
