@@ -584,8 +584,9 @@ def extract_features(data,idx):
             pass
         d1[name]=data[name]
     
-    if idx[0] in data.feature_names:  # given strings
-        idx=[data.feature_names.index(_) for _ in idx]
+    if 'feature_names' in data:
+        if idx[0] in data.feature_names:  # given strings
+            idx=[data.feature_names.index(_) for _ in idx]
     
     d1.vectors=data.vectors[:,idx]
     d1.feature_names=[data.feature_names[_i] for _i in idx]

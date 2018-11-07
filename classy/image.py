@@ -76,6 +76,16 @@ def vector_to_image(vector,shape,fname=None):
         im=Image.fromarray(arr)
         im.save(fname)
     
+
+def array_to_image_struct(arr):
+    data=Struct()
+    data.DESCR="Images"
+    data.files=[None]
+    data.data=[arr]
+    data.targets=[0]
+    data.target_names=['None']
+    return data
+
 def load_images_from_filepatterns(**kwargs):
     from glob import glob
     data=Struct()
