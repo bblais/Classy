@@ -4,7 +4,8 @@ import os
 import glob
 import numpy as np
 import classy.datasets
-
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def show_images(images,which_images=None,max_images=None):
     from pylab import imshow,subplot,sqrt,ceil,title,cm,gca
