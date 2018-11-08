@@ -4,10 +4,12 @@ from .Struct import Struct
 from sklearn.feature_extraction import DictVectorizer
 from copy import deepcopy as copy_data
 
-def remap_targets(dataset1,dataset2,new_target_names=None):
-    new_dataset2=Struct()
-    for key in dataset2:
-        new_dataset2[key]=dataset2[key]
+def remap_targets(dataset1,dataset2=None,new_target_names=None):
+
+    if not dataset2 is None:
+        new_dataset2=Struct()
+        for key in dataset2:
+            new_dataset2[key]=dataset2[key]
 
     new_dataset1=Struct()
     for key in dataset1:
@@ -16,26 +18,32 @@ def remap_targets(dataset1,dataset2,new_target_names=None):
     if new_target_names is None:
         new_target_names=dataset1.target_names[:]
         
-        for t in dataset2.target_names:
-            if t not in new_target_names:
-                new_target_names.append(t)
+        if not dataset2 is None:
+            for t in dataset2.target_names:
+                if t not in new_target_names:
+                    new_target_names.append(t)
                 
     
     new_dataset1.target_names=new_target_names
-    new_dataset2.target_names=new_target_names
+    if not dataset2 is None:
+        new_dataset2.target_names=new_target_names
     
     new_dataset1.targets=new_dataset1.targets.copy()
-    new_dataset2.targets=new_dataset2.targets.copy()
+    if not dataset2 is None:
+        new_dataset2.targets=new_dataset2.targets.copy()
     
 
     for i,t in enumerate(dataset1.targets):
         new_dataset1.targets[i]=new_target_names.index(dataset1.target_names[t])
         
-    for i,t in enumerate(dataset2.targets):
-        new_dataset2.targets[i]=new_target_names.index(dataset2.target_names[t])
+    if not dataset2 is None:
+        for i,t in enumerate(dataset2.targets):
+            new_dataset2.targets[i]=new_target_names.index(dataset2.target_names[t])
 
-
-    return new_dataset1,new_dataset2
+    if not dataset2 is None:
+        return new_dataset1,new_dataset2
+    else:
+        return new_dataset1
 
 
 def load_csv(fname,max_lines=None,sparse=False,verbose=True):
