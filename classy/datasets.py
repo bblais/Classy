@@ -4,7 +4,7 @@ from .Struct import Struct
 from sklearn.feature_extraction import DictVectorizer
 from copy import deepcopy as copy_data
 
-def remap_targets(dataset1,dataset2):
+def remap_targets(dataset1,dataset2,new_target_names=None):
     new_dataset2=Struct()
     for key in dataset2:
         new_dataset2[key]=dataset2[key]
@@ -13,12 +13,13 @@ def remap_targets(dataset1,dataset2):
     for key in dataset1:
         new_dataset1[key]=dataset1[key]
     
-    new_target_names=dataset1.target_names[:]
-    
-    for t in dataset2.target_names:
-        if t not in new_target_names:
-            new_target_names.append(t)
-            
+    if new_target_names is None:
+        new_target_names=dataset1.target_names[:]
+        
+        for t in dataset2.target_names:
+            if t not in new_target_names:
+                new_target_names.append(t)
+                
     
     new_dataset1.target_names=new_target_names
     new_dataset2.target_names=new_target_names
