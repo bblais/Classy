@@ -4,6 +4,30 @@ from .Struct import Struct
 from sklearn.feature_extraction import DictVectorizer
 from copy import deepcopy as copy_data
 
+def make_dataset(**kwargs):
+    from numpy import array
+    
+    feature_names=kwargs.pop('feature_names',None)
+    
+    vectors=[]
+    targets=[]
+    target_names=[]
+    for k,key in enumerate(kwargs):
+        for v in kwargs[key]:
+            vectors.append(v)
+            targets.append(k)
+        target_names.append(key)
+        
+    if feature_names is None:
+        feature_names=[str(_) for _ in range(len(v))]
+        
+    dataset=Struct(vectors=array(vectors),
+                  targets=array(targets),
+                  target_names=target_names,
+                  feature_names=feature_names)
+    
+    return dataset
+
 def remap_targets(dataset1,dataset2=None,new_target_names=None):
 
     if not dataset2 is None:
