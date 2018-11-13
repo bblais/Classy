@@ -171,7 +171,7 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
     revmode={'RGB':'color','L':'gray','1':'bw'}
 
     files=glob.glob(filter)
-    files=[_ for _ in files if 'Icon?' not in _]
+    files=[_ for _ in files if 'desktop.ini' not in _]
           
     im2=None
     for fname in files:
@@ -240,7 +240,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
             files_filter=os.path.join(dirname,name,filter)
             values=glob.glob(files_filter)
 
-            values=[_ for _ in values if 'Icon?' not in _]
+            values=[_ for _ in values if 'desktop.ini' not in _]
 
             if not max_per_folder is None:
                 if verbose:
