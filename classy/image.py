@@ -7,6 +7,65 @@ import classy.datasets
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+def split(images,test_size=0.2,verbose=True):
+    from numpy import where,array
+    from random import shuffle
+    
+    d1=Struct(split=True)
+    d2=Struct(split=True)  
+    
+    
+    skip_names=['files','data','targets']
+    for name in images:
+        if name in skip_names:
+            pass
+        d1[name]=images[name]
+        d2[name]=images[name]
+        
+    
+    num_targets=len(images.target_names)
+    d1.targets=[]
+    d2.targets=[]
+    
+    d1.data=[]
+    d2.data=[]
+    
+    d1.files=[]
+    d2.files=[]
+    
+    for k in range(num_targets):
+        idx=where(images.targets==k)[0]
+        
+        N=len(idx)
+        
+        if test_size<1: # fraction
+            N_test=int(test_size*N)+1
+        else:
+            N_test=test_size
+            
+        N_train=N-N_test
+        shuffle(idx)
+        
+        for i in idx[:N_test]:
+            d1.targets.append(images.targets[i])
+            d1.files.append(images.files[i])
+            d1.data.append(images.data[i])
+        for i in idx[N_test:]:
+            d2.targets.append(images.targets[i])
+            d2.files.append(images.files[i])
+            d2.data.append(images.data[i])
+            
+    d1.targets=array(d1.targets,dtype=np.int32)
+    d2.targets=array(d2.targets,dtype=np.int32)
+    
+    if verbose:
+        print("Files in Test Set:")
+        print("\t",','.join(d1.files))
+        print("Files in Train Set:")
+        print("\t",','.join(d2.files))
+        
+    return d1,d2
+
 def show_images(images,which_images=None,max_images=None):
     from pylab import imshow,subplot,sqrt,ceil,title,cm,gca
     from random import shuffle
@@ -97,7 +156,6 @@ def array_to_image_struct(arr):
 
     return data
 
-    
 
 def load_images_from_filepatterns(**kwargs):
     from glob import glob
