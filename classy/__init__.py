@@ -9,5 +9,5 @@ from . import sound
 from . import bio
 from . import preprocess
 
-__version__='0.0.21'
+__version__='0.0.22'
 print("Version: ",__version__)

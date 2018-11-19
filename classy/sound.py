@@ -1,3 +1,4 @@
+from __future__ import print_function
 def wav2image(fname,verbose=True):
     import glob,os
     from scipy.misc import imsave
