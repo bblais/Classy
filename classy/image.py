@@ -317,6 +317,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
         name='None'
         files_filter=os.path.join(dirname,filter)
         values=glob.glob(files_filter)
+        values=[_ for _ in values if 'desktop.ini' not in _]
         if not max_per_folder is None:
             if verbose:
                 print("[%s]: %d files found...%s used." % (name,len(values),max_per_folder))
