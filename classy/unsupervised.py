@@ -2,7 +2,7 @@ from sklearn.utils.extmath import safe_sparse_dot
 from . import autoencoder
 from sklearn.utils import check_X_y,check_array
 from .autoencoder import Autoencoder 
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import PCA as RandomizedPCA
 #from .multilayer_perceptron  import MultilayerPerceptronAutoencoder
 from numpy import array
 from .datasets import Struct
@@ -134,7 +134,7 @@ class AutoEncoder(Autoencoder,GenericFilter):
             title('Filter %d' % (idx))
             
             
-from sklearn.mixture import GMM
+from sklearn.mixture import GaussianMixture as GMM
             
 class GMM1D(GenericFilter):
     def __init__(self,number_of_gaussians):
