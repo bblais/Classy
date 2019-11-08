@@ -58,4 +58,6 @@ try:
 
 
 except ImportError:
-    print("Keras not installed")
+    class KerasMLP(object):
+        def __init__(self,**kwargs):
+            raise NotImplementedError("Keras not installed")
