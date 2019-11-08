@@ -287,11 +287,23 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
     data.targets=[]
     data.target_names=[]
     
-    files=os.listdir(dirname)
-    
-    for f in files:
-        if os.path.isdir(os.path.join(dirname,f)):
-            data.target_names.append(f)
+    if not os.path.isdir(dirname):  # this should be a filename, or a regex
+        base,fname=os.path.split(dirname)
+        if not base:
+            base='./'
+
+        dirname=base
+        filter=fname
+    else:
+
+        files=os.listdir(dirname)
+        
+        for f in files:
+            if os.path.isdir(os.path.join(dirname,f)):
+                data.target_names.append(f)
+
+
+
 
     if data.target_names:
         for i,name in enumerate(data.target_names):
