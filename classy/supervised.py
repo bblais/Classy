@@ -95,6 +95,7 @@ class NaiveBayes(GaussianNB,GenericClassifier):
 
     def __init__(self):
         GaussianNB.__init__(self)
+        self.var_smoothing=1e-2  # make it much more stable
         self.equivalent={'means':'theta_',
                          'stddevs':'sigma_',
                          'fraction':'class_prior_'}
