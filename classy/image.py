@@ -279,7 +279,7 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
             
 
 
-def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbose=True,make_grayscale=False):
+def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,max_per_folder=None,verbose=True,make_grayscale=False):
     data=Struct()
     data.DESCR="Images"
     data.files=[]
@@ -353,7 +353,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',max_per_folder=None,verbo
             
         ima=np.asarray(im)
 
-        if len(ima.shape)==3:
+        if delete_alpha and len(ima.shape)==3:
             ima=ima[:,:,:3]  # take out the alpha channel if it exists
 
         if size is None:
