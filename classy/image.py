@@ -157,7 +157,7 @@ def array_to_image_struct(arr):
     return data
 
 
-def load_images_from_filepatterns(**kwargs):
+def load_images_from_filepatterns(delete_alpha=False,**kwargs):
     from glob import glob
     data=Struct()
     data.DESCR="Images"
@@ -208,7 +208,7 @@ def load_images_from_filepatterns(**kwargs):
             im=im.convert('L')
         ima=np.asarray(im)
 
-        if len(ima.shape)==3:
+        if delete_alpha and len(ima.shape)==3:
             ima=ima[:,:,:3]  # take out the alpha channel if it exists
 
         data.data.append(ima)
