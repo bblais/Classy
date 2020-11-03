@@ -373,6 +373,7 @@ def images_to_vectors(origdata,truncate=False,verbose=True):
 
     same_shape=True
     first_time=True
+    smallest_shape=None
     for im in origdata.data:
         shape=im.shape
         if first_time:
@@ -385,6 +386,9 @@ def images_to_vectors(origdata,truncate=False,verbose=True):
             smallest_shape=[min(x,y) for x,y in zip(im.shape,smallest_shape)]
             same_shape=False
             
+    if smallest_shape is None:
+        raise ValueError("No images read.")
+
     data=Struct()
     data.target_names=origdata.target_names
     data.targets=origdata.targets
