@@ -300,6 +300,8 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,max_pe
         
         for f in files:
             if os.path.isdir(os.path.join(dirname,f)):
+                if ".ipynb_checkpoints" in f:
+                    continue
                 data.target_names.append(f)
 
 
