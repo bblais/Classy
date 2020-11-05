@@ -9,7 +9,8 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression as LogReg
 from sklearn.linear_model import SGDClassifier
 
-from .supervised_keras import *
+#from .supervised_keras import *
+from .supervised_numpynet import *
 
 class GenericClassifier(object):
     def percent_correct(self,vectors,targets):
