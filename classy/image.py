@@ -64,7 +64,7 @@ def split(images,test_size=0.2,verbose=True):
         print("Files in Train Set:")
         print("\t",','.join(d2.files))
         
-    return d1,d2
+    return d2,d1
 
 def show_images(images,which_images=None,max_images=None):
     from pylab import imshow,subplot,sqrt,ceil,title,cm,gca

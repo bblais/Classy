@@ -2,7 +2,7 @@ import matplotlib as mpl
 mpl.rcParams['lines.linewidth'] = 3
 mpl.rcParams['figure.figsize'] = (10,8)
 mpl.rcParams['axes.grid']=True
-
+mpl.rcParams['pcolor.shading']='auto'
 
 def bigfonts(size=20,family='sans-serif'):
 
