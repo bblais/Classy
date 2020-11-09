@@ -32,6 +32,7 @@ try:
         def fit(self,*args,**kwargs):
             images=args[0]
             im=images
+
             n_train=len(im.data)
             num_classes=len(im.target_names)
             if len(im.data[0].shape)==2:  # grayscale
@@ -40,9 +41,7 @@ try:
             else:
                 X=np.array(im.data)
                 #
-                
-            # normalization to [0, 1]
-            X = X/X.max()
+            
             y = to_categorical(im.targets).reshape(n_train, 1, 1, -1)            
             
 
@@ -94,10 +93,6 @@ try:
             else:
                 X=np.array(im.data)
                 
-            # normalization to [0, 1]
-            X = X/X.max()
-
-
             num_samples = X.shape[0]
             self.model.batch=num_samples
             _=self.model.predict(X=X,verbose=False)
@@ -122,8 +117,6 @@ try:
             else:
                 X=np.array(im.data)
                 
-            # normalization to [0, 1]
-            X = X/X.max()
             y = to_categorical(im.targets).reshape(n_train, 1, 1, -1)            
 
 
