@@ -37,10 +37,9 @@ try:
             if len(im.data[0].shape)==2:  # grayscale
                 X=np.array(im.data)
                 X = np.asarray([np.dstack((x, x, x)) for x in X])
-                X = X.transpose(0, 2, 3, 1)
             else:
                 X=np.array(im.data)
-                X = X.transpose(0, 2, 3, 1)
+                #
                 
             # normalization to [0, 1]
             X = X/X.max()
@@ -92,10 +91,8 @@ try:
             if len(im.data[0].shape)==2:  # grayscale
                 X=np.array(im.data)
                 X = np.asarray([np.dstack((x, x, x)) for x in X])
-                X = X.transpose(0, 2, 3, 1)
             else:
                 X=np.array(im.data)
-                X = X.transpose(0, 2, 3, 1)
                 
             # normalization to [0, 1]
             X = X/X.max()
@@ -122,10 +119,8 @@ try:
             if len(im.data[0].shape)==2:  # grayscale
                 X=np.array(im.data)
                 X = np.asarray([np.dstack((x, x, x)) for x in X])
-                X = X.transpose(0, 2, 3, 1)
             else:
                 X=np.array(im.data)
-                X = X.transpose(0, 2, 3, 1)
                 
             # normalization to [0, 1]
             X = X/X.max()
