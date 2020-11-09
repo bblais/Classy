@@ -2,7 +2,6 @@ import matplotlib as mpl
 mpl.rcParams['lines.linewidth'] = 3
 mpl.rcParams['figure.figsize'] = (10,8)
 mpl.rcParams['axes.grid']=True
-mpl.rcParams['pcolor.shading']='auto'
 
 def bigfonts(size=20,family='sans-serif'):
 
@@ -198,7 +197,7 @@ def plot2D(data,classifier=None,axis_range=None,
                              np.linspace(y_min,y_max,number_of_grid_points))
         Z = classifier.predict(np.c_[xx.ravel(), yy.ravel()])  
         Z = Z.reshape(xx.shape)  
-        pl.pcolormesh(xx, yy, Z, cmap=cmap_light)
+        pl.pcolormesh(xx, yy, Z, cmap=cmap_light,shading='auto')
 
     if not data.targets is None:
         pl.scatter(data.vectors[:, 0], data.vectors[:, 1], c=data.targets, cmap=cmap_bold)
