@@ -563,7 +563,7 @@ def load_ssdf(fname,verbose=True):
         summary(data)
     return data    
     
-def split(data,test_size=None,train_size=None,verbose=True):
+def split(data,test_size=None,train_size=None,shuffle=False,verbose=True):
     from sklearn.model_selection import train_test_split
     from copy import deepcopy
 

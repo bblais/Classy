@@ -214,13 +214,16 @@ try:
 
             return out
 
-        def predict(self, X):
+        def predict(self, X,**kwargs):
             from NumPyNet.utils import from_categorical
 
             # Reshape the data according to a 4D tensor
             num_samples, size = X.shape
             X = X.reshape(num_samples, 1, 1, size)
-            self.model.batch=num_samples
+
+            batch=kwargs.get('batch',num_samples)
+
+            self.model.batch=batch
             out=self.model.predict(X=X,verbose=False)
             predicted = from_categorical(out)
             

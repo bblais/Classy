@@ -7,9 +7,9 @@ import classy.datasets
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-def split(images,test_size=0.2,verbose=True):
+def split(images,test_size=0.2,verbose=True,shuffle=True):
     from numpy import where,array
-    from random import shuffle
+    import numpy.random
     
     d1=Struct(split=True)
     d2=Struct(split=True)  
@@ -44,7 +44,6 @@ def split(images,test_size=0.2,verbose=True):
             N_test=test_size
             
         N_train=N-N_test
-        shuffle(idx)
         
         for i in idx[:N_test]:
             d1.targets.append(images.targets[i])
@@ -58,6 +57,21 @@ def split(images,test_size=0.2,verbose=True):
     d1.targets=array(d1.targets,dtype=np.int32)
     d2.targets=array(d2.targets,dtype=np.int32)
     
+    if shuffle:
+        idx=np.array(range(len(d1.targets)))
+        np.random.shuffle(idx)
+        d1.targets=d1.targets[idx]
+        d1.files=[d1.files[i] for i in idx]
+        d1.data=[d1.data[i] for i in idx]
+
+
+        idx=np.array(range(len(d2.targets)))
+        np.random.shuffle(idx)
+        d2.targets=d2.targets[idx]
+        d2.files=[d2.files[i] for i in idx]
+        d2.data=[d2.data[i] for i in idx]
+
+
     if verbose:
         print("Files in Test Set:")
         print("\t",','.join(d1.files))
