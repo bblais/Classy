@@ -244,7 +244,7 @@ def save_csv(fname,data):
             for v in data.vectors:
                 fid.write(','.join([str(_) for _ in v]))
                 fid.write('\n')
-        
+
 def load_excel(fname,max_lines=None,sparse=False,verbose=True,sheet=None):
     import xlrd
     book = xlrd.open_workbook(fname)
@@ -470,6 +470,13 @@ def summary(data):
                 print(", ".join(["'%s'" % name for name in data.target_names]))
             else:
                 print("[None]")
+
+            for i,name in enumerate(data.target_names):
+                L=len(data.targets[data.targets==i])
+                print("[%s]: %d files" % (name,L))
+
+
+
         except (KeyError,AttributeError):
             pass
     elif "DESCR" in data and data.DESCR=="Sequences":
@@ -644,3 +651,31 @@ def extract_vectors(data,idx):
         d1.files=data.files[idx]
     
     return d1    
+
+def randbetween(low,high,N):
+    return np.random.rand(N)*(high-low)+low
+
+def double_moon_data(d=1,w=1,r=3,N=1000):
+    NA=N//2
+    NB=N-NA
+
+    θ=randbetween(0,180,NA)
+    R=randbetween(r-w/2,r+w/2,NA)
+
+    x=R*np.cos(np.radians(θ))
+    y=R*np.sin(np.radians(θ))
+
+    A_vectors=np.stack((x,y)).T
+
+
+    θ=randbetween(180,360,NA)
+    R=randbetween(r-w/2,r+w/2,NA)
+
+    x=R*np.cos(np.radians(θ))+r
+    y=R*np.sin(np.radians(θ))-d
+
+    B_vectors=np.stack((x,y)).T
+
+    data=make_dataset(Alice=A_vectors,Bob=B_vectors)    
+
+    return data    
