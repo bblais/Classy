@@ -11,11 +11,21 @@ from sklearn.linear_model import SGDClassifier
 
 from .supervised_numpynet import *
 
+import json
+class NumpyAwareJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            if obj.ndim == 1:
+                return obj.tolist()
+            else:
+                return [self.default(obj[i]) for i in range(obj.shape[0])]
+        return json.JSONEncoder.default(self, obj)
+
+
 class GenericClassifier(object):
     def percent_correct(self,vectors,targets):
         return self.score(vectors,targets)*100.0
     def predict_names(self,vectors,names):
-        
         result=self.predict(vectors)
         return [names[i] for i in result]
 
@@ -97,8 +107,12 @@ class NaiveBayes(GaussianNB,GenericClassifier):
         GaussianNB.__init__(self)
         self.var_smoothing=1e-2  # make it much more stable
         self.equivalent={'means':'theta_',
-                         'stddevs':'sigma_',
+                         'stddevs':'var_',
                          'fraction':'class_prior_'}
+
+        self.components=['class_count_','class_prior_','classes_','n_features_in_',
+        'var_','theta_','epsilon_',]
+
         #self.__dict__.update(self.equivalent)
 
     def fit(self,*args,**kwargs):
@@ -136,6 +150,39 @@ class NaiveBayes(GaussianNB,GenericClassifier):
             
         #pl.axis('equal')
         pl.gca().axis(ax)
+
+
+    def save(self,filename):
+        D={}
+        for key in self.components:
+            D[key]=self.__getattribute__(key)
+
+        
+        with open(filename, 'w') as f:
+            json.dump(D,f, sort_keys=True, indent=4,cls=NumpyAwareJSONEncoder)        
+
+    def load(self,filename):
+        with open(filename, 'r') as f:
+            D=json.load(f)
+
+        for key in self.components:
+            val=D[key]
+
+            try:
+                val[0]
+                val=np.array(val)
+            except TypeError:
+                pass
+
+            try:
+                super(GaussianNB,self).__setattr__(key,val)
+            except AttributeError:
+                print("Can't",key,val)
+                raise
+
+        for name in self.equivalent:
+            super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+    
 
 
 from sklearn.linear_model import Perceptron as skPerceptron
