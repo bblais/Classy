@@ -107,11 +107,11 @@ class NaiveBayes(GaussianNB,GenericClassifier):
         GaussianNB.__init__(self)
         self.var_smoothing=1e-2  # make it much more stable
         self.equivalent={'means':'theta_',
-                         'stddevs':'sigma',
+                         'stddevs':'sigma_',
                          'fraction':'class_prior_'}
 
         self.components=['class_count_','class_prior_','classes_','n_features_in_',
-        'sigma','theta_','epsilon_',]
+        'sigma_','theta_','epsilon_',]
 
         #self.__dict__.update(self.equivalent)
 
@@ -177,8 +177,12 @@ class NaiveBayes(GaussianNB,GenericClassifier):
             try:
                 super(GaussianNB,self).__setattr__(key,val)
             except AttributeError:
-                print("Can't",key,val)
-                raise
+                if key=='sigma_':
+                    key='var_'
+                    super(GaussianNB,self).__setattr__(key,val)
+                else:
+                    print("Can't",key,val)
+                    raise
 
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
