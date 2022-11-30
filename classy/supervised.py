@@ -107,11 +107,11 @@ class NaiveBayes(GaussianNB,GenericClassifier):
         GaussianNB.__init__(self)
         self.var_smoothing=1e-2  # make it much more stable
         self.equivalent={'means':'theta_',
-                         'stddevs':'var_',
+                         'stddevs':'sigma',
                          'fraction':'class_prior_'}
 
         self.components=['class_count_','class_prior_','classes_','n_features_in_',
-        'var_','theta_','epsilon_',]
+        'sigma','theta_','epsilon_',]
 
         #self.__dict__.update(self.equivalent)
 
