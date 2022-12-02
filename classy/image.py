@@ -313,15 +313,19 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,max_pe
         files=os.listdir(dirname)
         
         for f in files:
+            if ".ipynb_checkpoints" in f:
+                    continue
+            if ".DS_Store" in f:
+                    continue
             if os.path.isdir(os.path.join(dirname,f)):
                 if ".ipynb_checkpoints" in f:
                     continue
                 data.target_names.append(f)
-
-
-
+            else:
+                print("Expecting a folder of target-named folders.  Found ",os.path.join(dirname,f))
 
     if data.target_names:
+        found_zero=False
         for i,name in enumerate(data.target_names):
             files_filter=os.path.join(dirname,name,filter)
             values=glob.glob(files_filter)
@@ -335,10 +339,25 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,max_pe
             else:
                 if verbose:
                     print("[%s]: %d files found" % (name,len(values)))
-            
+                if len(values)==0:
+                    found_zero=True
+
             data.files.extend(values)
             data.targets.extend([i]*len(values))
         data.targets=np.array(data.targets,dtype=np.int32)
+        if found_zero:
+            warnings.warn("""Look's like your folders are not organized as expected. We're expecting something like
+%s/
+    target_name1/
+        image1.jpg                    
+        image2.jpg                    
+        image3.jpg                    
+    target_name2/
+        image4.jpg                    
+        image5.jpg                    
+        image6.jpg                    
+etc...                    
+                    """ % (dirname))
             
     else:
         data.targets=None
