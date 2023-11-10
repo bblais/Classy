@@ -140,7 +140,7 @@ def load_csv(fname,max_lines=None,sparse=False,verbose=True):
         target_names=[]
 
     dataset=Struct(vectors=vectors,targets=target,
-                target_names=target_names,feature_names=vectorizer.get_feature_names(),
+                target_names=target_names,feature_names=vectorizer.get_feature_names_out(),
                 vectorizer=vectorizer)
     
     if verbose:
@@ -327,7 +327,7 @@ def load_excel(fname,max_lines=None,sparse=False,verbose=True,sheet=None):
 
 
     dataset=Struct(vectors=vectors,targets=target,
-                target_names=target_names,feature_names=vectorizer.get_feature_names(),
+                target_names=target_names,feature_names=vectorizer.get_feature_names_out(),
                 vectorizer=vectorizer)
     
     if verbose:

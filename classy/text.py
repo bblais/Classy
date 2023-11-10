@@ -135,7 +135,7 @@ def count_letters(filenames):
             text.append(mytext)
         
     X=vectorizer.fit_transform(text).toarray()
-    return X,[str(_) for _ in vectorizer.get_feature_names()]     
+    return X,[str(_) for _ in vectorizer.get_feature_names_out()]     
      
 class LanguageFileClassifier(object):
     
@@ -212,7 +212,7 @@ def text_to_vectors(dirname_or_textdata,test_dirname_or_textdata=None,ngram_rang
     data.vectors=vectors
     data.targets=textdata.targets
     data.target_names=textdata.target_names
-    data.feature_names=vectorizer.get_feature_names()
+    data.feature_names=vectorizer.get_feature_names_out()
     
     if not test_dirname_or_textdata is None:
         if isinstance(test_dirname_or_textdata,str):
@@ -226,7 +226,7 @@ def text_to_vectors(dirname_or_textdata,test_dirname_or_textdata=None,ngram_rang
         test_data.vectors=test_vectors
         test_data.targets=textdata.targets
         test_data.target_names=textdata.target_names
-        test_data.feature_names=vectorizer.get_feature_names()
+        test_data.feature_names=vectorizer.get_feature_names_out()
         
         return data,test_data
     else:
