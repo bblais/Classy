@@ -107,11 +107,11 @@ class NaiveBayes(GaussianNB,GenericClassifier):
         GaussianNB.__init__(self)
         self.var_smoothing=1e-2  # make it much more stable
         self.equivalent={'means':'theta_',
-                         'stddevs':'sigma_',
+                         'stddevs':'var_',
                          'fraction':'class_prior_'}
 
         self.components=['class_count_','class_prior_','classes_','n_features_in_',
-        'sigma_','theta_','epsilon_',]
+        'var_','theta_','epsilon_',]
 
         #self.__dict__.update(self.equivalent)
 
@@ -121,6 +121,8 @@ class NaiveBayes(GaussianNB,GenericClassifier):
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
     
+        self.stddevs=np.sqrt(self.stddevs)
+
     def anotherfit(self, X, y):
         X,y=check_X_y(X,y)
             
@@ -186,6 +188,7 @@ class NaiveBayes(GaussianNB,GenericClassifier):
 
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+        self.stddevs=np.sqrt(self.stddevs)
     
 
 
@@ -219,8 +222,8 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         self.r_max=r_max
         self.r_step=r_step
         self.metric = metric
-        self.centers_=np.array([],dtype=np.float)
-        self.radii_=np.array([],dtype=np.float)
+        self.centers_=np.array([],dtype=float)
+        self.radii_=np.array([],dtype=float)
         self.targets_=np.array([],dtype=np.int)
         self.verbose=verbose
         
@@ -230,8 +233,8 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         except AttributeError:
             pass
         
-        center=np.array(center,dtype=np.float)
-        radius=np.array([radius],dtype=np.float)
+        center=np.array(center,dtype=float)
+        radius=np.array([radius],dtype=float)
         target=np.array([target],dtype=np.int)
         if len(self.centers_)==0:
             self.centers_=center
@@ -360,8 +363,8 @@ class CSCsk(BaseEstimator, ClassifierMixin):
     def __init__(self, metric='euclidean',r_step=1e-30,verbose=False):
         self.r_step=r_step
         self.metric = metric
-        self.centers_=np.array([],dtype=np.float)
-        self.radii_=np.array([],dtype=np.float)
+        self.centers_=np.array([],dtype=float)
+        self.radii_=np.array([],dtype=float)
         self.targets_=np.array([],dtype=np.int)
         self.verbose=verbose
         
@@ -371,8 +374,8 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         except AttributeError:
             pass
 
-        center=np.array(center,dtype=np.float)
-        radius=np.array([radius],dtype=np.float)
+        center=np.array(center,dtype=float)
+        radius=np.array([radius],dtype=float)
         target=np.array([target],dtype=np.int)
         if len(self.centers_)==0:
             self.centers_=center

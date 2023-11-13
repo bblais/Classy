@@ -442,7 +442,7 @@ def images_to_vectors(origdata,truncate=False,verbose=True):
                 raise ValueError(">3D shapes not supported")
                 
         vec=ima.ravel()
-        vec=vec.astype(np.float)
+        vec=vec.astype(float)
         
         data.vectors.append(vec)
         
@@ -546,7 +546,7 @@ def images_to_patch_vectors(origdata,patch_size,max_patches=None,overlap=True,
            
            
 
-    data.vectors=np.array(data.vectors,dtype=np.float)
+    data.vectors=np.array(data.vectors,dtype=float)
     data.original_vector_number=np.array(data.original_vector_number,dtype=np.int32)
     if not target is None:
         data.targets=np.array(data.targets)

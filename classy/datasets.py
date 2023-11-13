@@ -218,7 +218,7 @@ def load_csv_orig(fname,max_lines=None,verbose=True):
         target_names=[]
     
     
-    vectors=np.array(vectors,dtype=np.float)
+    vectors=np.array(vectors,dtype=float)
     
     dataset=Struct(vectors=vectors,targets=target,target_names=target_names,feature_names=feature_names)
     
@@ -416,7 +416,7 @@ def load_excel_orig(fname,max_lines=None,verbose=True,sheet=None):
         target=None
         target_names=[]
     
-    vectors=np.array(vectors,dtype=np.float)
+    vectors=np.array(vectors,dtype=float)
     
     dataset=Struct(vectors=vectors,targets=target,target_names=target_names,feature_names=feature_names)
     if verbose:
