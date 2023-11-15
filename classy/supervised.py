@@ -224,7 +224,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         self.metric = metric
         self.centers_=np.array([],dtype=float)
         self.radii_=np.array([],dtype=float)
-        self.targets_=np.array([],dtype=np.int)
+        self.targets_=np.array([],dtype=int)
         self.verbose=verbose
         
     def _add_center(self,center,radius,target):
@@ -235,7 +235,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
         
         center=np.array(center,dtype=float)
         radius=np.array([radius],dtype=float)
-        target=np.array([target],dtype=np.int)
+        target=np.array([target],dtype=int)
         if len(self.centers_)==0:
             self.centers_=center
             self.targets_=target
@@ -365,7 +365,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         self.metric = metric
         self.centers_=np.array([],dtype=float)
         self.radii_=np.array([],dtype=float)
-        self.targets_=np.array([],dtype=np.int)
+        self.targets_=np.array([],dtype=int)
         self.verbose=verbose
         
     def _add_center(self,center,radius,target):
@@ -376,7 +376,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
 
         center=np.array(center,dtype=float)
         radius=np.array([radius],dtype=float)
-        target=np.array([target],dtype=np.int)
+        target=np.array([target],dtype=int)
         if len(self.centers_)==0:
             self.centers_=center
             self.targets_=target
@@ -422,6 +422,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         count=np.array(count)
 
         # second pass
+        added=[]
         for v,t in zip(X,y): # Go through all of the data points
             #Select the sphere that contains that point, 
             # and the largest number of other points, 
@@ -434,8 +435,9 @@ class CSCsk(BaseEstimator, ClassifierMixin):
             idx_matched=idx[matched]
             best=idx_matched[np.argmax(count[matched])]
     
-    
-            self._add_center(X[best],radii[best],y[best])
+            if not best in added:
+                self._add_center(X[best],radii[best],y[best])
+                added.append(best)
         
             pass_number+=1
                 
