@@ -14,6 +14,18 @@ try:
     from NumPyNet.metrics import mean_accuracy_score
     import numpy as np
 
+    import json
+    class NumpyAwareJSONEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.ndarray):
+                if obj.ndim == 1:
+                    return obj.tolist()
+                else:
+                    return [self.default(obj[i]) for i in range(obj.shape[0])]
+            return json.JSONEncoder.default(self, obj)
+
+
+
     def accuracy (y_true, y_pred):
         '''
         Temporary metrics to overcome "from_categorical" missing in standard metrics
@@ -137,6 +149,22 @@ try:
 
             self.dummy_y=None
 
+        def init_model(self,batch):
+            
+            assert not self.model_dict is None
+            if self.model is None:
+                self.model = Network(batch=batch, input_shape=(1,1,self.model_dict['input']))
+
+                hidden=self.model_dict.get('hidden',[])
+                for n,typ in hidden:
+                    self.model.add(Connected_layer(outputs=n, activation=typ))
+
+                n,typ=self.model_dict['output']
+                self.model.add(Connected_layer(outputs=n, activation=typ))
+                self.model.add(Cost_layer(cost_type=self.model_dict['cost']))
+                self.model.compile(optimizer=Adam(), metrics=[accuracy])
+                self.model.summary()
+
 
         def fit(self,*args,**kwargs):
             X,y=args[0],args[1]
@@ -152,26 +180,7 @@ try:
             self.dummy_y = one_hot_y = one_hot_y.reshape(num_samples,1,1,-1)
             batch=kwargs.get('batch',num_samples)
 
-
-            if self.model is None:
-                if self.model_dict is None:
-                    self.model_dict = {
-                                        'input':size,               # number of features
-                                        'hidden':[(5,'logistic'),],
-                                        'output':(num_classes,'logistic'),  # number of classes
-                                        'cost':'mse',
-                                    }
-                self.model = Network(batch=batch, input_shape=(1,1,self.model_dict['input']))
-
-                hidden=self.model_dict.get('hidden',[])
-                for n,typ in hidden:
-                    self.model.add(Connected_layer(outputs=n, activation=typ))
-
-                n,typ=self.model_dict['output']
-                self.model.add(Connected_layer(outputs=n, activation=typ))
-                self.model.add(Cost_layer(cost_type=self.model_dict['cost']))
-                self.model.compile(optimizer=Adam(), metrics=[accuracy])
-                self.model.summary()
+            self.init_model(batch)
 
             self.model.batch=batch
             self.model.fit(X=X, y=one_hot_y, max_iter=epochs)
@@ -234,8 +243,31 @@ try:
             return [names[i] for i in result]
 
 
+        def save(self,filename):
 
+            assert self.model._fitted
+            
+            D={}
+            D['model_dict']=self.model_dict
+            D['weights']=[L.weights if 'weights' in L.__dict__ else [] for L in self.model._net ]
+            D['bias']=[L.bias if 'bias' in L.__dict__ else [] for L in self.model._net ]
 
+            with open(filename, 'w') as f:
+                json.dump(D,f, sort_keys=True, indent=4,cls=NumpyAwareJSONEncoder)        
+
+        def load(self,filename):
+            with open(filename, 'r') as f:
+                D=json.load(f)
+        
+            self.model_dict=D['model_dict']
+            self.init_model(1)
+
+            for L,W,B in zip(self.model._net,D['weights'],D['bias']):
+                if 'weights' in L.__dict__:
+                    L.weights=np.array(W)
+                    L.bias==np.array(B)
+
+            self.model._fitted=True            
 
 
 except ImportError:

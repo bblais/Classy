@@ -98,8 +98,54 @@ class kNearestNeighbor(KNeighborsClassifier,GenericClassifier):
     def __init__(self,k=5):
         self.k=k        
         KNeighborsClassifier.__init__(self,n_neighbors=k)
-       
+        self.components=['classes_', 'k','n_features_in_','_fit_X',
+                        '_fit_method',
+                        #'_tree',
+                        '_y',
+                        'classes_',
+                        'effective_metric_',
+                        'effective_metric_params_',
+                        'n_features_in_',
+                        'n_samples_fit_',
+                        'outputs_2d_']
+
+        self.as_array=['_fit_X','_y','classes_']
+        self.equivalent={}
+
+    def save(self,filename):
+        D={}
+        for key in self.components:
+            D[key]=self.__getattribute__(key)
+
         
+        with open(filename, 'w') as f:
+            json.dump(D,f, sort_keys=True, indent=4,cls=NumpyAwareJSONEncoder)        
+        
+    def load(self,filename):
+        from sklearn.neighbors import KDTree 
+
+        with open(filename, 'r') as f:
+            D=json.load(f)
+
+        for key in self.components:
+            val=D[key]
+
+            if key in self.as_array:
+                val=np.array(val)
+
+            try:
+                super(KNeighborsClassifier,self).__setattr__(key,val)
+            except AttributeError:
+                print("Can't",key,val)
+                raise
+
+        for name in self.equivalent:
+            super(KNeighborsClassifier,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+
+        self._tree=KDTree(self._fit_X)
+
+
+
 from sklearn.naive_bayes import GaussianNB
 class NaiveBayes(GaussianNB,GenericClassifier):
 
@@ -337,6 +383,8 @@ class RCE(RCEsk,GenericClassifier):
         self.equivalent={'centers':'centers_',
                          'radii':'radii_',
                          'targets':'targets_'}
+        self.components=['centers_','radii_','targets_']
+        self.as_array=self.components
                          
         self.__dict__.update(self.equivalent)
 
@@ -357,6 +405,35 @@ class RCE(RCEsk,GenericClassifier):
             
         pl.axis('equal')
         
+    def save(self,filename):
+        D={}
+        for key in self.components:
+            D[key]=self.__getattribute__(key)
+
+        
+        with open(filename, 'w') as f:
+            json.dump(D,f, sort_keys=True, indent=4,cls=NumpyAwareJSONEncoder)        
+
+    def load(self,filename):
+
+        with open(filename, 'r') as f:
+            D=json.load(f)
+
+        for key in self.components:
+            val=D[key]
+
+            if key in self.as_array:
+                val=np.array(val)
+
+            try:
+                super(RCEsk,self).__setattr__(key,val)
+            except AttributeError:
+                print("Can't",key,val)
+                raise
+
+        for name in self.equivalent:
+            super(RCEsk,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+
         
         
 class CSCsk(BaseEstimator, ClassifierMixin):
@@ -466,6 +543,11 @@ class CSC(CSCsk,GenericClassifier):
                          'radii':'radii_',
                          'targets':'targets_'}
                          
+        self.components=['centers_','radii_','targets_']
+        self.as_array=self.components
+
+
+
         self.__dict__.update(self.equivalent)
 
     def fit(self,*args,**kwargs):
@@ -485,6 +567,37 @@ class CSC(CSCsk,GenericClassifier):
             
         pl.axis('equal')
                 
+    def save(self,filename):
+        D={}
+        for key in self.components:
+            D[key]=self.__getattribute__(key)
+
+        
+        with open(filename, 'w') as f:
+            json.dump(D,f, sort_keys=True, indent=4,cls=NumpyAwareJSONEncoder)        
+
+    def load(self,filename):
+
+        with open(filename, 'r') as f:
+            D=json.load(f)
+
+        for key in self.components:
+            val=D[key]
+
+            if key in self.as_array:
+                val=np.array(val)
+
+            try:
+                super(CSCsk,self).__setattr__(key,val)
+            except AttributeError:
+                print("Can't",key,val)
+                raise
+
+        for name in self.equivalent:
+            super(CSCsk,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+
+
+
 
 # from http://danielfrg.com/blog/2013/07/03/basic-neural-network-python/
 

@@ -317,6 +317,8 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,max_pe
                     continue
             if ".DS_Store" in f:
                     continue
+            if "desktop.ini" in f.lower():
+                    continue
             if os.path.isdir(os.path.join(dirname,f)):
                 if ".ipynb_checkpoints" in f:
                     continue
