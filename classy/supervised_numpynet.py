@@ -60,6 +60,7 @@ try:
             epochs=kwargs.get('epochs',10)  
             num_samples = X.shape[0]
             batch=kwargs.get('batch',num_samples)
+            learning_rate=kwargs.get('learning_rate',0.1)
 
 
             if not self.compiled:
@@ -74,7 +75,7 @@ try:
      
 
             self.model.batch=batch
-            self.model.fit(X=X, y=y, max_iter=epochs)
+            self.model.fit(X=X, y=y, max_iter=epochs,gamma=learning_rate)
 
             self.weights=[]
             self.bias=[]
