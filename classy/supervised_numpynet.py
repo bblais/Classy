@@ -260,13 +260,19 @@ try:
             with open(filename, 'r') as f:
                 D=json.load(f)
         
+            if not self.model_dict==D['model_dict']:
+                print("Model architecture doesn't match?")
+                print("Loaded:",D['model_dict'])
+                print("Current:",self.model_dict)
+
+
             self.model_dict=D['model_dict']
             self.init_model(1)
 
             for L,W,B in zip(self.model._net,D['weights'],D['bias']):
                 if 'weights' in L.__dict__:
                     L.weights=np.array(W)
-                    L.bias==np.array(B)
+                    L.bias=np.array(B)
 
             self.model._fitted=True            
 

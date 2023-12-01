@@ -24,6 +24,7 @@ setup(
   description="Python Classification",
   author="Brian Blais",
   packages=['classy',],
+  install_requires=['sklearn>=1.3.0'],
 )
 
 
