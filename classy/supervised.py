@@ -105,8 +105,6 @@ class kNearestNeighbor(KNeighborsClassifier,GenericClassifier):
                         'classes_',
                         'effective_metric_',
                         'effective_metric_params_',
-                        'n_features_in_',
-                        'n_samples_fit_',
                         'outputs_2d_']
 
         self.as_array=['_fit_X','_y','classes_']
