@@ -227,21 +227,23 @@ class NaiveBayes(GaussianNB,GenericClassifier):
             except TypeError:
                 pass
 
-            try:
-                super(GaussianNB,self).__setattr__(key,val)
-            except AttributeError:
-                if key=='sigma_':
-                    key='var_'
-                    super(GaussianNB,self).__setattr__(key,val)
-                else:
-                    print("Can't",key,val)
-                    raise
-
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
         self.stddevs=np.sqrt(self.stddevs)
     
 
+    def __getattr__(self, item):
+        translate={'var_':'sigma_',
+                  }
+
+        if item in translate:
+            value=self.__dict__[translate[item]]
+            self.__dict__[item]=value
+        else:
+            raise AttributeError(item)
+        
+        
+        return value
 
 from sklearn.linear_model import Perceptron as skPerceptron
 class Perceptron(skPerceptron,GenericClassifier):
