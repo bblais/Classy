@@ -156,7 +156,7 @@ class NaiveBayes(GaussianNB,GenericClassifier):
                          'stddevs':'var_',
                          'fraction':'class_prior_'}
 
-        self.components=['class_count_','class_prior_','classes_','n_features_in_',
+        self.components=['class_count_','class_prior_','classes_',
         'var_','theta_','epsilon_',]
 
         #self.__dict__.update(self.equivalent)
