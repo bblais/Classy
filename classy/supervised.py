@@ -164,6 +164,11 @@ class NaiveBayes(GaussianNB,GenericClassifier):
     def fit(self,*args,**kwargs):
             
         GaussianNB.fit(self,*args,**kwargs)
+        try:
+            v=self.__getattribute__('var_')
+        except AttributeError:  # changing the names of features hack
+            self.var_=self.sigma_
+
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
     
