@@ -98,7 +98,7 @@ class kNearestNeighbor(KNeighborsClassifier,GenericClassifier):
     def __init__(self,k=5):
         self.k=k        
         KNeighborsClassifier.__init__(self,n_neighbors=k)
-        self.components=['classes_', 'k','n_features_in_','_fit_X',
+        self.components=['classes_', 'k','_fit_X',
                         '_fit_method',
                         #'_tree',
                         '_y',
