@@ -226,6 +226,8 @@ class NaiveBayes(GaussianNB,GenericClassifier):
                 val=np.array(val)
             except TypeError:
                 pass
+            super(GaussianNB,self).__setattr__(key,val)
+
 
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
