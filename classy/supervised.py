@@ -220,7 +220,6 @@ class NaiveBayes(GaussianNB,GenericClassifier):
 
         for key in self.components:
             val=D[key]
-
             try:
                 val[0]
                 val=np.array(val)
@@ -228,11 +227,23 @@ class NaiveBayes(GaussianNB,GenericClassifier):
                 pass
             super(GaussianNB,self).__setattr__(key,val)
 
+        self.apply_translate()
 
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
         self.stddevs=np.sqrt(self.stddevs)
     
+    def apply_translate(self):
+        translate=[ ('var_','sigma_'),
+                    ]                  
+
+        for key1,key2 in translate:
+            if key1 in self.__dict__:
+                self.__dict__[key2]=self.__dict__[key1]
+            elif key2 in self.__dict__:
+                self.__dict__[key1]=self.__dict__[key2]
+            else:
+                raise AttributeError((key1,key2))
 
     def __getattr__(self, item):
         translate={'var_':'sigma_',
@@ -245,7 +256,7 @@ class NaiveBayes(GaussianNB,GenericClassifier):
             raise AttributeError(item)
         
         
-        return value
+        return self[item]
 
 from sklearn.linear_model import Perceptron as skPerceptron
 class Perceptron(skPerceptron,GenericClassifier):
