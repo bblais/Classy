@@ -104,6 +104,7 @@ class kNearestNeighbor(KNeighborsClassifier,GenericClassifier):
                         '_y',
                         'classes_',
                         'effective_metric_',
+                        'n_samples_fit_',
                         'effective_metric_params_',
                         'outputs_2d_']
 
