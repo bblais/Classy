@@ -29,6 +29,35 @@ def make_dataset(**kwargs):
     
     return dataset
 
+def pandas_to_dataset(df,target=None,verbose=True):
+    from classy import Struct,summary
+    from numpy import array
+    
+    cols=list(df.columns)
+    if target:
+        if target not in cols:
+            raise ValueError(f"Target name '{target}' not found")
+
+        cols.remove(target)
+
+        target_names=sorted(list(set(df[target].values)))
+        targets=array([target_names.index(_) for _ in df[target].values])
+        dataset=Struct(vectors=df[cols].values,
+                    targets=targets,
+                    target_names=target_names,
+                    feature_names=cols)
+    else:
+        dataset=Struct(vectors=df[cols].values,
+                    targets=None,
+                    target_names=[],
+                    feature_names=cols)
+
+    if verbose:
+        summary(dataset)
+    
+    return dataset
+
+
 def remap_targets(dataset1,dataset2=None,new_target_names=None):
 
     if not dataset2 is None:

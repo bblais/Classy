@@ -28,6 +28,19 @@ class GenericClassifier(object):
     def predict_names(self,vectors,names):
         result=self.predict(vectors)
         return [names[i] for i in result]
+    def confusion_matrix(self,data_test):
+        from pandas import DataFrame
+        predictions=self.predict(data_test.vectors)
+        confusion_mat=np.zeros((len(data_test.target_names),len(data_test.target_names)),int)
+        for predict_i,n0 in enumerate(data_test.target_names):
+            for true_i,n1 in enumerate(data_test.target_names):
+                confusion_mat[predict_i,true_i]=int(np.sum((data_test.targets==true_i) & (predictions==predict_i)))        
+        df=DataFrame(data=confusion_mat,
+                        columns=[f'True {_}' for _ in data_test.target_names],
+                        index=[f'Predicted {_}' for _ in data_test.target_names])
+
+        return df
+    
 
 class SVM(SVC,GenericClassifier):
     pass
