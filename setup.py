@@ -2,8 +2,6 @@
 
 from distutils.core import setup
 
-import numpy
-
 def get_version():
     
     d={}
