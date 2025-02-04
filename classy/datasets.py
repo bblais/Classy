@@ -29,11 +29,16 @@ def make_dataset(**kwargs):
     
     return dataset
 
-def pandas_to_dataset(df,target=None,verbose=True):
+def pandas_to_dataset(df,target=None,columns=None,verbose=True):
     from classy import Struct,summary
     from numpy import array
     
-    cols=list(df.columns)
+    if columns is None:
+        cols=list(df.columns)
+    else:
+        cols=columns
+        df=df[cols]
+
     if target:
         if target not in cols:
             raise ValueError(f"Target name '{target}' not found")
