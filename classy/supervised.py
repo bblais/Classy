@@ -9,7 +9,26 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression as LogReg
 from sklearn.linear_model import SGDClassifier
 
-from .supervised_numpynet import *
+#from .supervised_numpynet import *
+from .supervised_jax import *
+
+from functools import wraps
+
+def reshape_vectors(func):
+    @wraps(func)
+    def wrapper(self,*args, **kwargs):
+        # Reshape the first argument (assume it's a NumPy array)
+        original_shape = args[0].shape
+        reshaped_vectors = args[0].reshape(original_shape[0], -1)
+        
+        # Call the original function with the reshaped array
+        new_args = (reshaped_vectors, *args[1:])
+        result = func(self,*new_args, **kwargs)
+
+        return result
+    
+    return wrapper
+
 
 import json
 class NumpyAwareJSONEncoder(json.JSONEncoder):
@@ -23,8 +42,12 @@ class NumpyAwareJSONEncoder(json.JSONEncoder):
 
 
 class GenericClassifier(object):
+    
+    @reshape_vectors
     def percent_correct(self,vectors,targets):
         return self.score(vectors,targets)*100.0
+
+    @reshape_vectors
     def predict_names(self,vectors,names):
         result=self.predict(vectors)
         return [names[i] for i in result]
@@ -156,7 +179,9 @@ class kNearestNeighbor(KNeighborsClassifier,GenericClassifier):
 
         self._tree=KDTree(self._fit_X)
 
-
+    @reshape_vectors
+    def fit(self,*args,**kwargs):
+        KNeighborsClassifier.fit(self,*args,**kwargs)
 
 from sklearn.naive_bayes import GaussianNB
 class NaiveBayes(GaussianNB,GenericClassifier):
@@ -173,9 +198,14 @@ class NaiveBayes(GaussianNB,GenericClassifier):
 
         #self.__dict__.update(self.equivalent)
 
+    @reshape_vectors
     def fit(self,*args,**kwargs):
             
+        vectors=args[0]
+        shape=vectors.shape
+        vectors = vectors.reshape(vectors.shape[0], -1)
         GaussianNB.fit(self,*args,**kwargs)
+        vectors = vectors.reshape(shape)
         try:
             v=self.__getattribute__('var_')
         except AttributeError:  # changing the names of features hack
@@ -186,6 +216,7 @@ class NaiveBayes(GaussianNB,GenericClassifier):
     
         self.stddevs=np.sqrt(self.stddevs)
 
+    @reshape_vectors
     def anotherfit(self, X, y):
         X,y=check_X_y(X,y)
             
@@ -194,6 +225,7 @@ class NaiveBayes(GaussianNB,GenericClassifier):
         for name in self.equivalent:
             super(GaussianNB,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
     
+    @reshape_vectors
     def predict_probability(X):
         return predict_proba(X)
 
@@ -323,7 +355,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
             self.targets_=np.concatenate( (self.targets_,target) )
             self.radii_=np.concatenate( (self.radii_,radius) )
         
-        
+    @reshape_vectors
     def fit(self, X, y):
         X,y=check_X_y(X,y)
         # X, y = check_arrays(X, y, sparse_format="csr")
@@ -391,6 +423,7 @@ class RCEsk(BaseEstimator, ClassifierMixin):
                 stop=True
                 
                 
+    @reshape_vectors
     def predict(self,X):
         X = check_array(X)        
         if len(self.centers_)==0:
@@ -420,6 +453,7 @@ class RCE(RCEsk,GenericClassifier):
                          
         self.__dict__.update(self.equivalent)
 
+    @reshape_vectors
     def fit(self,*args,**kwargs):
         RCEsk.fit(self,*args,**kwargs)
         for name in self.equivalent:
@@ -496,6 +530,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
             self.radii_=np.concatenate( (self.radii_,radius) )
         
         
+    @reshape_vectors
     def fit(self, X, y):
         X,y=check_X_y(X,y)
         # X, y = check_arrays(X, y, sparse_format="csr")
@@ -550,6 +585,7 @@ class CSCsk(BaseEstimator, ClassifierMixin):
         
             pass_number+=1
                 
+    @reshape_vectors
     def predict(self,X):
         X = check_array(X)        
         if len(self.centers_)==0:
@@ -582,6 +618,7 @@ class CSC(CSCsk,GenericClassifier):
 
         self.__dict__.update(self.equivalent)
 
+    @reshape_vectors
     def fit(self,*args,**kwargs):
         CSCsk.fit(self,*args,**kwargs)
         for name in self.equivalent:
@@ -628,147 +665,5 @@ class CSC(CSCsk,GenericClassifier):
         for name in self.equivalent:
             super(CSCsk,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
 
-
-
-
-# from http://danielfrg.com/blog/2013/07/03/basic-neural-network-python/
-
-from scipy import optimize
-class NN_1HLsk(BaseEstimator, ClassifierMixin):
-    
-    def __init__(self, hidden_layer_size=25, reg_lambda=0, epsilon_init=0.12, opti_method='TNC', maxiter=500):
-        self.reg_lambda = reg_lambda
-        self.epsilon_init = epsilon_init
-        self.hidden_layer_size = hidden_layer_size
-        self.activation_func = self.sigmoid
-        self.activation_func_prime = self.sigmoid_prime
-        self.method = opti_method
-        self.maxiter = maxiter
-    
-    def sigmoid(self, z):
-        return 1 / (1 + np.exp(-z))
-    
-    def sigmoid_prime(self, z):
-        sig = self.sigmoid(z)
-        return sig * (1 - sig)
-    
-    def sumsqr(self, a):
-        return np.sum(a ** 2)
-    
-    def rand_init(self, l_in, l_out):
-        return np.random.rand(l_out, l_in + 1) * 2 * self.epsilon_init - self.epsilon_init
-    
-    def pack_thetas(self, t1, t2):
-        return np.concatenate((t1.reshape(-1), t2.reshape(-1)))
-    
-    def unpack_thetas(self, thetas, input_layer_size, hidden_layer_size, num_labels):
-        t1_start = 0
-        t1_end = hidden_layer_size * (input_layer_size + 1)
-        t1 = thetas[t1_start:t1_end].reshape((hidden_layer_size, input_layer_size + 1))
-        t2 = thetas[t1_end:].reshape((num_labels, hidden_layer_size + 1))
-        return t1, t2
-    
-    def _forward(self, X, t1, t2):
-        m = X.shape[0]
-        ones = None
-        if len(X.shape) == 1:
-            ones = np.array(1).reshape(1,)
-        else:
-            ones = np.ones(m).reshape(m,1)
-        
-        # Input layer
-        a1 = np.hstack((ones, X))
-        
-        # Hidden Layer
-        z2 = np.dot(t1, a1.T)
-        a2 = self.activation_func(z2)
-        a2 = np.hstack((ones, a2.T))
-        
-        # Output layer
-        z3 = np.dot(t2, a2.T)
-        a3 = self.activation_func(z3)
-        return a1, z2, a2, z3, a3
-    
-    def function(self, thetas, input_layer_size, hidden_layer_size, num_labels, X, y, reg_lambda):
-        t1, t2 = self.unpack_thetas(thetas, input_layer_size, hidden_layer_size, num_labels)
-        
-        m = X.shape[0]
-        Y = np.eye(num_labels)[y]
-        
-        _, _, _, _, h = self._forward(X, t1, t2)
-        costPositive = -Y * np.log(h).T
-        costNegative = (1 - Y) * np.log(1 - h).T
-        cost = costPositive - costNegative
-        J = np.sum(cost) / m
-        
-        if reg_lambda != 0:
-            t1f = t1[:, 1:]
-            t2f = t2[:, 1:]
-            reg = (self.reg_lambda / (2 * m)) * (self.sumsqr(t1f) + self.sumsqr(t2f))
-            J = J + reg
-        return J
-        
-    def function_prime(self, thetas, input_layer_size, hidden_layer_size, num_labels, X, y, reg_lambda):
-        t1, t2 = self.unpack_thetas(thetas, input_layer_size, hidden_layer_size, num_labels)
-        
-        m = X.shape[0]
-        t1f = t1[:, 1:]
-        t2f = t2[:, 1:]
-        Y = np.eye(num_labels)[y]
-        
-        Delta1, Delta2 = 0, 0
-        for i, row in enumerate(X):
-            a1, z2, a2, z3, a3 = self._forward(row, t1, t2)
-            
-            # Backprop
-            d3 = a3 - Y[i, :].T
-            d2 = np.dot(t2f.T, d3) * self.activation_func_prime(z2)
-            
-            Delta2 += np.dot(d3[np.newaxis].T, a2[np.newaxis])
-            Delta1 += np.dot(d2[np.newaxis].T, a1[np.newaxis])
-            
-        Theta1_grad = (1 / m) * Delta1
-        Theta2_grad = (1 / m) * Delta2
-        
-        if reg_lambda != 0:
-            Theta1_grad[:, 1:] = Theta1_grad[:, 1:] + (reg_lambda / m) * t1f
-            Theta2_grad[:, 1:] = Theta2_grad[:, 1:] + (reg_lambda / m) * t2f
-        
-        return self.pack_thetas(Theta1_grad, Theta2_grad)
-    
-    def fit(self, X, y):
-        num_features = X.shape[0]
-        input_layer_size = X.shape[1]
-        num_labels = len(set(y))
-        
-        theta1_0 = self.rand_init(input_layer_size, self.hidden_layer_size)
-        theta2_0 = self.rand_init(self.hidden_layer_size, num_labels)
-        thetas0 = self.pack_thetas(theta1_0, theta2_0)
-        
-        options = {'maxiter': self.maxiter}
-        _res = optimize.minimize(self.function, thetas0, jac=self.function_prime, method=self.method, 
-                                 args=(input_layer_size, self.hidden_layer_size, num_labels, X, y, 0), options=options)
-        
-        self.t1, self.t2 = self.unpack_thetas(_res.x, input_layer_size, self.hidden_layer_size, num_labels)
-    
-    def predict(self, X):
-        return self.predict_proba(X).argmax(0)
-    
-    def predict_proba(self, X):
-        _, _, _, _, h = self._forward(X, self.t1, self.t2)
-        return h                
-
-class NN_1HL(NN_1HLsk,GenericClassifier):
-    def __init__(self,N, **kwargs):
-        NN_1HLsk.__init__(self,hidden_layer_size=N, **kwargs)
-        self.equivalent={}
-                         
-        self.__dict__.update(self.equivalent)
-
-    def fit(self,*args,**kwargs):
-        NN_1HLsk.fit(self,*args,**kwargs)
-        for name in self.equivalent:
-            super(NN_1HL,self).__setattr__(name,
-                self.__getattribute__(self.equivalent[name]))
 
 

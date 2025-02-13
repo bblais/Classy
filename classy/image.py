@@ -406,7 +406,7 @@ etc...
 
     return data
 
-def images_to_vectors(origdata,truncate=False,verbose=True):
+def images_to_vectors(origdata,truncate=False,full=False,verbose=True):
 
     same_shape=True
     first_time=True
@@ -443,13 +443,15 @@ def images_to_vectors(origdata,truncate=False,verbose=True):
             else:
                 raise ValueError(">3D shapes not supported")
                 
-        vec=ima.ravel()
-        vec=vec.astype(float)
+        if not full:
+            vec=ima.ravel().astype(float)
+        else:
+            vec=ima.astype(float)
         
         data.vectors.append(vec)
         
     data.vectors=np.array(data.vectors)
-    data.feature_names=['p%d' % p for p in range(data.vectors.shape[1])]
+    data.feature_names=['p%d' % p for p in range(np.prod(data.vectors.shape[1:]))]
     if verbose:
         classy.datasets.summary(data)
         

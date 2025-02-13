@@ -39,7 +39,9 @@ def setminmax(data,min=None,max=None):
 
 def standardize(data):
     from sklearn.preprocessing import scale
-    scale(data.vectors,copy=False)
+    data.vectors[:]-=data.vectors.mean()
+    data.vectors[:]/=data.vectors.std()
+    #scale(data.vectors,copy=False)
     
 
 def cross_validation(cl,vectors,targets,cv=5):

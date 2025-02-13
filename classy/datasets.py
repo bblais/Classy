@@ -530,7 +530,11 @@ def summary(data):
         
     else:
 
-        print("%d vectors of length %d" % (data.vectors.shape[0],data.vectors.shape[1]))
+        if len(data.vectors.shape)==2:
+            print("%d vectors of length %d" % (data.vectors.shape[0],data.vectors.shape[1]))
+        else:
+            print("%d vectors of shape %s" % (data.vectors.shape[0],str(data.vectors.shape[1:])))
+
         try:
             print("Feature names:", end=' ')
             
