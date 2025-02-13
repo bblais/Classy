@@ -72,60 +72,60 @@ class LogisticRegression(LogReg,GenericClassifier):
     pass
 
    
-class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
-    def __init__(self,**kwargs):
-        if 'tol' not in kwargs:
-            kwargs['tol']=1e-7
+# class BackProp(MultilayerPerceptronClassifier,GenericClassifier):
+#     def __init__(self,**kwargs):
+#         if 'tol' not in kwargs:
+#             kwargs['tol']=1e-7
     
-        MultilayerPerceptronClassifier.__init__(self,**kwargs)
-        self.equivalent={'weights':'coefs_',
-        }
+#         MultilayerPerceptronClassifier.__init__(self,**kwargs)
+#         self.equivalent={'weights':'coefs_',
+#         }
                          
-        self.__dict__.update(self.equivalent)
+#         self.__dict__.update(self.equivalent)
         
-    def fit(self,*args,**kwargs):
+#     def fit(self,*args,**kwargs):
             
-        MultilayerPerceptronClassifier.fit(self,*args,**kwargs)
-        for name in self.equivalent:
-            super(MultilayerPerceptronClassifier,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
+#         MultilayerPerceptronClassifier.fit(self,*args,**kwargs)
+#         for name in self.equivalent:
+#             super(MultilayerPerceptronClassifier,self).__setattr__(name,self.__getattribute__(self.equivalent[name]))
     
 
-    def output(self, X):
-        """Fit the model to the data X and target y.
+#     def output(self, X):
+#         """Fit the model to the data X and target y.
 
-        Parameters
-        ----------
-        X : {array-like, sparse matrix}, shape (n_samples, n_features)
+#         Parameters
+#         ----------
+#         X : {array-like, sparse matrix}, shape (n_samples, n_features)
 
-        Returns
-        -------
-        array, shape (n_samples)
-        Predicted target values per element in X.
-        """
+#         Returns
+#         -------
+#         array, shape (n_samples)
+#         Predicted target values per element in X.
+#         """
 
-        X = check_array(X, accept_sparse=['csr', 'csc', 'coo'])
+#         X = check_array(X, accept_sparse=['csr', 'csc', 'coo'])
 
-        # Make sure self.hidden_layer_sizes is a list
-        hidden_layer_sizes = self.hidden_layer_sizes
-        if not hasattr(hidden_layer_sizes, "__iter__"):
-            hidden_layer_sizes = [hidden_layer_sizes]
-        hidden_layer_sizes = list(hidden_layer_sizes)
+#         # Make sure self.hidden_layer_sizes is a list
+#         hidden_layer_sizes = self.hidden_layer_sizes
+#         if not hasattr(hidden_layer_sizes, "__iter__"):
+#             hidden_layer_sizes = [hidden_layer_sizes]
+#         hidden_layer_sizes = list(hidden_layer_sizes)
 
-        layer_units = [X.shape[1]] + hidden_layer_sizes + \
-            [self.n_outputs_]
+#         layer_units = [X.shape[1]] + hidden_layer_sizes + \
+#             [self.n_outputs_]
 
-        # Initialize layers
-        activations = []
-        activations.append(X)
+#         # Initialize layers
+#         activations = []
+#         activations.append(X)
 
-        for i in range(self.n_layers_ - 1):
-            activations.append(np.empty((X.shape[0],
-                                         layer_units[i + 1])))
-        # forward propagate
-        self._forward_pass(activations)
-        y_pred = activations[-1]
+#         for i in range(self.n_layers_ - 1):
+#             activations.append(np.empty((X.shape[0],
+#                                          layer_units[i + 1])))
+#         # forward propagate
+#         self._forward_pass(activations)
+#         y_pred = activations[-1]
 
-        return activations[1:]
+#         return activations[1:]
 
 
 from sklearn.neighbors import KNeighborsClassifier
