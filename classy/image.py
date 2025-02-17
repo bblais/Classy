@@ -293,7 +293,14 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
             
 
 
-def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,max_per_folder=None,verbose=True,make_grayscale=False):
+def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
+                    max_per_folder=None,verbose=True,make_grayscale=False):
+    
+    import zipfile
+    import numpy as np
+    from PIL import Image
+    from io import BytesIO
+
     data=Struct()
     data.DESCR="Images"
     data.files=[]
@@ -301,7 +308,75 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,max_pe
     data.targets=[]
     data.target_names=[]
     
-    if not os.path.isdir(dirname):  # this should be a filename, or a regex
+    if ".zip" in dirname:  # zip file
+        zipname=dirname
+        if zipname.endswith('/'):
+            zipname=zipname[:-1]
+
+        parts=zipname.split('/')
+        zipname=parts[0]
+
+        if len(parts)>1:
+            rest='/'.join(parts[1:])+"/"
+        else:
+            rest=''
+
+        with zipfile.ZipFile(zipname, 'r') as z:
+            filenames = [f for f in z.namelist() 
+                        if not '__MACOSX' in f and
+                        not '.DS_Store' in f and
+                        not 'desktop.ini' in f and
+                        not '.ipynb_checkpoints' in f and
+                        f.startswith(rest)
+                        ]
+
+            new_filenames=[f.replace(rest,'') for f in filenames]
+            #filenames=['/'.join(f.split('/')[1:]) for f in filenames]
+
+            correct_folder_structure=all([len(f.split('/')[1:])<=2 for f in new_filenames])
+            if not correct_folder_structure:
+                print([f for f in new_filenames if f.endswith('/')])
+
+
+            assert correct_folder_structure,"Not correct folder structure"
+
+            target_names=[f.replace('/','') for f in new_filenames if f.endswith('/')]
+
+            for i,name in enumerate(target_names):
+                files=[f for f,f2 in zip(filenames,new_filenames)
+                                            if f2.startswith(name+"/") and
+                                            not f2.endswith('/')] 
+                data.files.extend(files)
+                data.targets.extend([i]*len(files))
+                if verbose:
+                    print("[%s]: %d files found" % (name,len(files)))
+                
+            data.target_names=target_names
+
+            all_same_size=True
+            size=None
+            for fname in data.files:
+                with z.open(fname) as file:
+                    img = Image.open(BytesIO(file.read())).convert('RGB')
+                    if make_grayscale:
+                        img=img.convert('L')
+                    img=np.array(img)
+
+                    if size is None:
+                        size=img.shape
+                    else:
+                        if img.shape!=size:
+                            all_same_size=False
+
+                    
+                    data.data.append(img)
+            
+            if not all_same_size:
+                print("Warning: not all images the same size.")
+
+        return data
+
+    elif not os.path.isdir(dirname):  # this should be a filename, or a regex
         base,fname=os.path.split(dirname)
         if not base:
             base='./'
