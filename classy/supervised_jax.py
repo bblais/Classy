@@ -42,6 +42,8 @@ class Average_Pool(object):
 from flax.linen import Conv as Convolutional
 from flax.linen import Dense
 
+
+
         
     
 class Input(object):
@@ -55,6 +57,7 @@ from flax.errors import ScopeParamShapeError
 class NeuralNetwork(nn.Module):
     layers:tuple
     
+    @nn.compact
     def __call__(self, x):
         try:
             for i,layer in enumerate(self.layers):
@@ -64,6 +67,10 @@ class NeuralNetwork(nn.Module):
             raise
             
         return x
+
+    def get_layer_output(self, x, layer_idx):
+        """Safely apply a specific layer by calling it inside a method."""
+        return self.layers[layer_idx](x)
 
 
 
@@ -135,7 +142,7 @@ def train_epoch(state, vectors,targets,num_classes,batch_size, epoch, rng,layers
 
 class BackProp(object):
 
-    def __init__(self,layers):
+    def __init__(self,layers,learning_rate=0.001,):
 
         self.rng = jax.random.PRNGKey(0)
         self.rng, self.init_rng = jax.random.split(self.rng)
@@ -149,8 +156,8 @@ class BackProp(object):
         
         self.params = self.mlp.init(self.init_rng, jnp.ones(self.full_shape))['params']
 
-        self.tx = optax.adam(learning_rate=0.001)
-        self.state = train_state.TrainState.create(apply_fn=self.mlp.apply, params=self.params, tx=self.tx)
+        self.tx = optax.adam(learning_rate=learning_rate)
+        self.state = train_state.TrainState.create(apply_fn=self.mlp.apply, params=self.params,tx=self.tx)
 
         self.batch_size=64
         self.training_losses=[]
@@ -162,9 +169,23 @@ class BackProp(object):
         return self.mlp.tabulate(self.init_rng, jnp.ones(self.full_shape),
                    compute_flops=False, compute_vjp_flops=False)
 
+    def output(self,x):
+        y, state = self.mlp.apply({'params': self.state.params}, jnp.atleast_2d(jnp.array(x)), 
+                    capture_intermediates=True, mutable=["intermediates"])
+        intermediates = state['intermediates']
+    
+        arr=[]
+        for key in intermediates:
+            if isinstance(intermediates[key],dict):
+                arr.append(intermediates[key]['__call__'])
+
+
+        return arr
+
 
 
     def fit(self,vectors,targets,epochs=10,verbose=False):
+
         
         num_classes=self.mlp.layers[-1].features
         if len(vectors.shape)==3:  # images
