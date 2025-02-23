@@ -151,8 +151,9 @@ class BackProp(object):
         self.mlp = NeuralNetwork(tuple(layers[1:]))
         self.input=layers[0]
         self.full_shape=[1]+list(self.input.shape)
-        if len(self.full_shape)<4:
-            self.full_shape+=[1]
+
+        if len(self.input.shape)==2:  # 2D images
+             self.full_shape+=[1]
         
         self.params = self.mlp.init(self.init_rng, jnp.ones(self.full_shape))['params']
 
