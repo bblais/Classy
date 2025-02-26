@@ -357,7 +357,11 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
             size=None
             for fname in data.files:
                 with z.open(fname) as file:
-                    img = Image.open(BytesIO(file.read())).convert('RGB')
+                    #img = Image.open(BytesIO(file.read())).convert('RGB')
+                    img=Image.open(BytesIO(file.read()))
+                    if img.mode=='1' or img.mode=='LA':
+                        img=img.convert('L')
+
                     if make_grayscale:
                         img=img.convert('L')
                     img=np.array(img)
@@ -374,6 +378,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
             if not all_same_size:
                 print("Warning: not all images the same size.")
 
+        data.targets=np.array(data.targets,dtype=np.int32)
         return data
 
     elif not os.path.isdir(dirname):  # this should be a filename, or a regex
