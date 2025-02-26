@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image,UnidentifiedImageError
 from .Struct import Struct
 import os
 import glob
@@ -325,6 +325,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
             filenames = [f for f in z.namelist() 
                         if not '__MACOSX' in f and
                         not '.DS_Store' in f and
+                        not 'Icon' in f and
                         not 'desktop.ini' in f and
                         not '.ipynb_checkpoints' in f and
                         f.startswith(rest)
@@ -358,7 +359,12 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
             for fname in data.files:
                 with z.open(fname) as file:
                     #img = Image.open(BytesIO(file.read())).convert('RGB')
-                    img=Image.open(BytesIO(file.read()))
+                    try:
+                        img=Image.open(BytesIO(file.read()))
+                    except UnidentifiedImageError:
+                        print(fname)
+                        raise
+
                     if img.mode=='1' or img.mode=='LA':
                         img=img.convert('L')
 

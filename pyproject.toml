@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "classy"
+version = "0.0.59"
+description = "A simple wrapper around classification algorithms."
+authors = [{ name = "Brian Blais", email = "bblais@bryant.edu" }]
+dependencies = [
+    "numpy",
+    "scipy",
+    "statsmodels",
+    "PIL",
+    "flax",
+]
+
+[tool.setuptools]
+packages = ["classy"]  # Replace with your package's module name
