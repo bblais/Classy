@@ -11,7 +11,7 @@ dependencies = [
     "numpy",
     "scipy",
     "statsmodels",
-    "PIL",
+    "Pillow",
     "flax",
 ]
 
