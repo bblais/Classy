@@ -294,7 +294,8 @@ def process_images(filter,newdirname='.',resize=None,colormode=None,ext=None):
 
 
 def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
-                    max_per_folder=None,verbose=True,make_grayscale=False):
+                    max_per_folder=None,verbose=True,make_grayscale=False,
+                    resize=None):
     
     import zipfile
     import numpy as np
@@ -370,7 +371,14 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
 
                     if make_grayscale:
                         img=img.convert('L')
+
+
+                    if resize is not None:
+                        img=img.resize(resize)
+
                     img=np.array(img)
+
+                    
 
                     if size is None:
                         size=img.shape
@@ -473,6 +481,8 @@ etc...
 
         if make_grayscale:
             im=im.convert('L')
+        if resize is not None:
+            im=im.resize(resize)
             
         ima=np.asarray(im)
 
