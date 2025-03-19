@@ -485,7 +485,36 @@ def vectors_to_image(vectors,binary=False,axis='square'):
 def summary(data):
     from scipy.sparse import issparse
     
-    if "DESCR" in data and data.DESCR=="Images":
+    if "DESCR" in data and data.DESCR=="3D Images":
+        print("3D Images")
+        print("%d 3D images of shape %s" % (len(data.data),str(data.data[0].shape)))
+    
+        try:
+            if not data.targets is None:
+                data.targets
+                print("Target values given.")
+            else:
+                print("No Target values.")
+        except (KeyError,AttributeError):
+                print("No Target values.")
+                
+        try:            
+            print("Target names:", end=' ')
+            if data.target_names:
+                print(", ".join(["'%s'" % name for name in data.target_names]))
+            else:
+                print("[None]")
+
+            for i,name in enumerate(data.target_names):
+                L=len(data.targets[data.targets==i])
+                print("[%s]: %d files" % (name,L))
+
+
+
+        except (KeyError,AttributeError):
+            pass
+
+    elif "DESCR" in data and data.DESCR=="Images":
         print("Images")
         print("%d images of shape %s" % (len(data.data),str(data.data[0].shape)))
     
@@ -566,10 +595,19 @@ def summary(data):
         except (KeyError,AttributeError):
             pass
 
-        print("Mean: ",data.vectors.mean(axis=0))
-        if not issparse(data.vectors):
-            print("Median: ",np.median(data.vectors,axis=0))
-            print("Stddev: ",np.std(data.vectors,axis=0))        
+        if len(data.vectors.shape)==4:
+            print("Min: ",data.vectors.min())
+            print("Max: ",data.vectors.max())
+            print("Min: ",data.vectors.min())
+            if not issparse(data.vectors):
+                print("Median: ",np.median(data.vectors))
+                print("Stddev: ",np.std(data.vectors))        
+
+        else:
+            print("Mean: ",data.vectors.mean(axis=0))
+            if not issparse(data.vectors):
+                print("Median: ",np.median(data.vectors,axis=0))
+                print("Stddev: ",np.std(data.vectors,axis=0))        
         
         
     
