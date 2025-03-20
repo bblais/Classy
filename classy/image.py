@@ -301,6 +301,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
     import numpy as np
     from PIL import Image
     from io import BytesIO
+    from random import shuffle
 
     data=Struct()
     data.DESCR="Images"
@@ -343,10 +344,18 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
             assert correct_folder_structure,"Not correct folder structure"
 
             target_names=list(set([_.split("/")[0] for _ in new_filenames]))
+            
+
             for i,name in enumerate(target_names):
                 files=[f for f,f2 in zip(filenames,new_filenames)
                                             if f2.startswith(name+"/") and
                                             not f2.endswith('/')] 
+                
+
+                if max_per_folder is not None:
+                    shuffle(files)
+                    files=files[:max_per_folder]
+                    
                 data.files.extend(files)
                 data.targets.extend([i]*len(files))
                 if verbose:

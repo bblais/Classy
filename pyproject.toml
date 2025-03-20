@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "classy"
-version = "0.0.61"
+version = "0.0.62"
 description = "A simple wrapper around classification algorithms."
 authors = [{ name = "Brian Blais", email = "bblais@bryant.edu" }]
 dependencies = [
