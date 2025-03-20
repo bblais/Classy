@@ -331,7 +331,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
                         not '.ipynb_checkpoints' in f and
                         f.startswith(rest)
                         ]
-
+            
             new_filenames=[f.replace(rest,'') for f in filenames]
             #filenames=['/'.join(f.split('/')[1:]) for f in filenames]
 
@@ -342,8 +342,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
 
             assert correct_folder_structure,"Not correct folder structure"
 
-            target_names=[f.replace('/','') for f in new_filenames if f.endswith('/')]
-
+            target_names=list(set([_.split("/")[0] for _ in new_filenames]))
             for i,name in enumerate(target_names):
                 files=[f for f,f2 in zip(filenames,new_filenames)
                                             if f2.startswith(name+"/") and
