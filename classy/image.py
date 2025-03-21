@@ -483,19 +483,26 @@ etc...
     all_same_size=True
     size=None
     for fname in data.files:
-        im=Image.open(fname)
-        if im.mode=='1' or im.mode=='LA':
-            im=im.convert('L')
 
-        if make_grayscale:
-            im=im.convert('L')
-        if resize is not None:
-            im=im.resize(resize)
-            
-        ima=np.asarray(im)
+        if fname.endswith('.npy'):
+            ima=np.load(fname)
 
-        if delete_alpha and len(ima.shape)==3:
-            ima=ima[:,:,:3]  # take out the alpha channel if it exists
+        else:
+            im=Image.open(fname)
+
+            if im.mode=='1' or im.mode=='LA':
+                im=im.convert('L')
+
+            if make_grayscale:
+                im=im.convert('L')
+
+            if resize is not None:
+                im=im.resize(resize)
+                
+            ima=np.asarray(im)
+
+            if delete_alpha and len(ima.shape)==3:
+                ima=ima[:,:,:3]  # take out the alpha channel if it exists
 
         if size is None:
             size=ima.shape
