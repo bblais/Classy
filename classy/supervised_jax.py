@@ -38,11 +38,25 @@ class Average_Pool(object):
     def __call__(self,x):
         return nn.avg_pool(x, **self.dict)
 
+class Max_Pool(object):
+    def __init__(self,window_shape=(2, 2), strides=(2, 2),**kwargs):
+        self.dict=kwargs
+        self.dict['window_shape']=window_shape
+        self.dict['strides']=strides
+        
+    def __call__(self,x):
+        return nn.max_pool(x, **self.dict)
+
+# class Batch_Normalization(object):
+#     def __init__(self):
+#         pass
+
+#     def __call__(self,x):
+#         return nn.BatchNorm(x)
+
 
 from flax.linen import Conv as Convolutional
-from flax.linen import Dense
-
-
+from flax.linen import Dense,BatchNorm
 
         
     
