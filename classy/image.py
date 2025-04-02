@@ -343,7 +343,7 @@ def load_images(dirname,test_dirname=None,filter='*.*',delete_alpha=False,
 
             assert correct_folder_structure,"Not correct folder structure"
 
-            target_names=list(set([_.split("/")[0] for _ in new_filenames]))
+            target_names=list(set([_.split("/")[0] for _ in new_filenames if _]))
             
 
             for i,name in enumerate(target_names):
