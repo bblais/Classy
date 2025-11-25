@@ -1,6 +1,14 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: classy
-Version: 0.0.49
-Summary: Python Classification
+Version: 0.0.65
+Summary: A simple wrapper around classification algorithms.
 Author: Brian Blais
+Author-email: Brian Blais <bblais@bryant.edu>
 License-File: LICENSE.md
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: statsmodels
+Requires-Dist: Pillow
+Requires-Dist: flax
+Dynamic: author
+Dynamic: license-file
