@@ -3,4 +3,3 @@ pillow
 scikit-learn
 jax
 xlrd
-
