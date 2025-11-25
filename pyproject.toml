@@ -8,7 +8,7 @@ version = "0.0.68"
 description = "A simple wrapper around classification algorithms."
 authors = [{ name = "Brian Blais", email = "bblais@bryant.edu" }]
 dependencies = [
-    "numpy=1.26.4",
+    "numpy<2.3",
     "scipy",
     "Pillow",
     "flax",
