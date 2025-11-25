@@ -1,6 +1,6 @@
-numpy>=1.23
-scipy
-pandas
-matplotlib
-sklearn
+numpy<2.3
+pillow
+scikit-learn
 flax
+jax
+xlrd
