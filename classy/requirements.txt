@@ -1,5 +1,6 @@
 numpy<2.3
 pillow
-statsmodels
 scikit-learn
 jax
+xlrd
+
