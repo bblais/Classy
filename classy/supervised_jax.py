@@ -206,6 +206,9 @@ class BackProp(object):
         if len(vectors.shape)==3:  # images
             shape=list(vectors.shape)+[1]
             vectors=jnp.reshape(vectors,shape)
+
+        if vectors.shape[0]<self.batch_size:
+            self.batch_size=vectors.shape[0]
         
         for epoch in tqdm(range(1, epochs + 1)):
             # Use a separate PRNG key to permute image data during shuffling
